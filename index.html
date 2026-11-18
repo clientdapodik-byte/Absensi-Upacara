@@ -1,25 +1,26 @@
 <!DOCTYPE html>
-<html lang="id" data-theme="light">
+<html lang="id" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#4f46e5">
+  <meta name="theme-color" content="#0c0516">
   <title>SIM Absensi Upacara GTK — SMK Negeri Tambakboyo</title>
   <script>
-    // Terapkan tema sebelum render agar tidak berkedip
+    // Terapkan tema sebelum render agar tidak berkedip (bawaan: mode gelap "konser malam")
     (function () {
       try {
         var t = localStorage.getItem('smk_theme');
-        if (!t) t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        if (!t) t = 'dark';
         document.documentElement.setAttribute('data-theme', t);
       } catch (e) {}
     })();
   </script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
       theme: { extend: { fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'], ttd: ['"Alex Brush"', 'cursive'] } } }
@@ -27,69 +28,111 @@
   </script>
   <style>
     :root {
-      --bg: #f4f5fb; --surface: #ffffff; --surface2: #f2f4fa; --border: #e5e8f1;
-      --text: #0f172a; --muted: #64748b; --faint: #94a3b8;
-      --primary: #4f46e5; --primary-h: #4338ca; --primary-soft: #eef0ff;
-      --ok: #059669; --ok-soft: #e8faf2; --warn: #d97706; --warn-soft: #fff6e5;
-      --info: #0284c7; --info-soft: #e8f6fd; --bad: #e11d48; --bad-soft: #ffeef1;
-      --mute: #475569; --mute-soft: #eef1f6;
-      --shadow: 0 1px 2px rgba(15,23,42,.04), 0 10px 28px -14px rgba(15,23,42,.14);
-      --ring: rgba(79,70,229,.2); --grid: #eef0f6;
+      --bg: #fff4fa; --surface: #ffffff; --surface2: #fdeaf5; --border: #f6d3e8; --line: #e9b8d6;
+      --text: #2a1038; --muted: #7a5a8c; --faint: #b394c4;
+      --primary: #ff2d95; --primary-h: #e01a80; --primary2: #8b5cf6; --primary-soft: #ffe6f3; --cyan: #06b6d4;
+      --ok: #059e78; --ok-soft: #dcfbef; --warn: #d97706; --warn-soft: #fff3dd;
+      --info: #0891b2; --info-soft: #dcf6fb; --bad: #e11d48; --bad-soft: #ffe4ec;
+      --mute: #6b5b7b; --mute-soft: #f3eaf7;
+      --shadow: 0 1px 2px rgba(120,20,90,.05), 0 12px 30px -14px rgba(180,30,120,.22);
+      --ring: rgba(255,45,149,.25); --grid: #f7e3ef;
       --ease: cubic-bezier(.22,1,.36,1);
     }
     html[data-theme="dark"] {
-      --bg: #0a0f1e; --surface: #121a30; --surface2: #19223e; --border: #25305219;
-      --border: #263256; --text: #e8ecf8; --muted: #94a0bf; --faint: #66729a;
-      --primary: #818cf8; --primary-h: #a5b4fc; --primary-soft: #1e2650;
-      --ok: #34d399; --ok-soft: #0f2a24; --warn: #fbbf24; --warn-soft: #2e2410;
-      --info: #38bdf8; --info-soft: #0e2733; --bad: #fb7185; --bad-soft: #301620;
-      --mute: #cbd5e1; --mute-soft: #1d2744;
-      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 30px -14px rgba(0,0,0,.6);
-      --ring: rgba(129,140,248,.28); --grid: #1c2644;
+      --bg: #0c0516; --surface: #170a2a; --surface2: #21103b; --border: #3a1d60; --line: #52308a;
+      --text: #f7ecff; --muted: #b9a0d6; --faint: #7d63a3;
+      --primary: #ff4fa8; --primary-h: #ff7bbd; --primary2: #a78bfa; --primary-soft: #3a1245; --cyan: #22d3ee;
+      --ok: #34e8b4; --ok-soft: #082a24; --warn: #fbbf24; --warn-soft: #2e2410;
+      --info: #38d4f5; --info-soft: #0a2a35; --bad: #ff6b8f; --bad-soft: #38102a;
+      --mute: #d6c4ea; --mute-soft: #2a1747;
+      --shadow: 0 1px 2px rgba(0,0,0,.35), 0 14px 34px -14px rgba(255,79,168,.28);
+      --ring: rgba(255,79,168,.3); --grid: #2a1547;
     }
     * { -webkit-tap-highlight-color: transparent; }
     html { scroll-behavior: smooth; }
-    body {
-      background: var(--bg); color: var(--text);
-      background-image:
-        radial-gradient(900px 420px at 85% -10%, rgba(99,102,241,.10), transparent 60%),
-        radial-gradient(700px 380px at -5% 105%, rgba(14,165,233,.07), transparent 60%);
-      background-attachment: fixed;
-      transition: background-color .35s var(--ease), color .35s var(--ease);
-    }
+    body { background: var(--bg); color: var(--text); transition: background-color .35s var(--ease), color .35s var(--ease); }
+    h1, h2, h3 { font-family: 'Outfit', 'Inter', system-ui, sans-serif; }
+    .doc-official h3, .doc-official h4 { font-family: Arial, Helvetica, sans-serif; }
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 9999px; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--faint); }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(var(--primary), var(--primary2)); border-radius: 9999px; }
     ::selection { background: var(--ring); }
+    button:focus { outline: none; }
+    :focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: 10px; }
+    input::-ms-reveal, input::-ms-clear { display: none; }
+    input:-webkit-autofill { -webkit-box-shadow: 0 0 0 40px var(--surface2) inset !important; -webkit-text-fill-color: var(--text) !important; }
+
+    /* ---------- Panggung: lampu sorot, aurora, bintang ---------- */
+    .aurora { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+    .aurora i { position: absolute; border-radius: 50%; filter: blur(90px); opacity: .42; animation: drift 18s ease-in-out infinite; }
+    .aurora i:nth-child(1) { width: 520px; height: 520px; left: -120px; top: -140px; background: #ff6ec7; }
+    .aurora i:nth-child(2) { width: 460px; height: 460px; right: -120px; top: 22%; background: #22d3ee; animation-delay: -6s; }
+    .aurora i:nth-child(3) { width: 440px; height: 440px; left: 35%; bottom: -220px; background: #8b5cf6; animation-delay: -11s; }
+    html[data-theme="dark"] .aurora i { opacity: .28; }
+    @keyframes drift { 50% { transform: translate(60px, -40px) scale(1.12); } }
+    .aurora b { position: absolute; top: -30%; width: 260px; height: 160%; transform-origin: top center; filter: blur(22px); opacity: .16; animation: sweep 9s ease-in-out infinite; }
+    .aurora b:nth-child(4) { left: 18%; background: linear-gradient(180deg, #ff4fa8, transparent 72%); }
+    .aurora b:nth-child(5) { right: 16%; background: linear-gradient(180deg, #22d3ee, transparent 72%); animation-delay: -4.5s; animation-direction: reverse; }
+    html[data-theme="dark"] .aurora b { opacity: .34; }
+    @keyframes sweep { 0%, 100% { transform: rotate(-20deg); } 50% { transform: rotate(20deg); } }
+    .spk { position: absolute; background: var(--c, #ff4fa8); clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%); opacity: 0; animation: twinkle var(--d, 4s) ease-in-out infinite; animation-delay: var(--dl, 0s); }
+    @keyframes twinkle { 0%, 100% { opacity: 0; transform: scale(.3) rotate(0deg); } 50% { opacity: .9; transform: scale(1) rotate(90deg); } }
+
+    /* ---------- Ikon ---------- */
+    .ico { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; font-style: normal; }
+
+    /* ---------- Ticker ---------- */
+    .ticker { overflow: hidden; border-radius: 16px; border: 1px solid var(--border); background: linear-gradient(90deg, var(--primary-soft), var(--surface), var(--primary-soft)); padding: .55rem 0; }
+    .ticker-track { display: flex; width: max-content; animation: tick 32s linear infinite; }
+    .ticker:hover .ticker-track { animation-play-state: paused; }
+    .tk { display: inline-flex; align-items: center; gap: .55rem; margin-right: 2.2rem; font-weight: 800; font-size: .66rem; letter-spacing: .2em; color: var(--primary); white-space: nowrap; }
+    .tk svg { color: var(--cyan); }
+    @keyframes tick { to { transform: translateX(-50%); } }
+
+    /* ---------- Equalizer ---------- */
+    .eq { display: inline-flex; align-items: flex-end; gap: 3px; height: 20px; }
+    .eq i { width: 4px; border-radius: 2px; background: #fff; height: 30%; animation: eq 1s ease-in-out infinite; }
+    .eq i:nth-child(2) { animation-delay: -.25s; } .eq i:nth-child(3) { animation-delay: -.5s; }
+    .eq i:nth-child(4) { animation-delay: -.15s; } .eq i:nth-child(5) { animation-delay: -.7s; }
+    @keyframes eq { 0%, 100% { height: 25%; } 50% { height: 100%; } }
+
+    /* ---------- Percikan bintang saat klik ---------- */
+    .burst { position: fixed; width: 11px; height: 11px; pointer-events: none; z-index: 200; background: var(--c); clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%); animation: burst .75s ease-out forwards; }
+    @keyframes burst { from { transform: translate(0,0) scale(1) rotate(0); opacity: 1; } to { transform: translate(var(--dx), var(--dy)) scale(.2) rotate(200deg); opacity: 0; } }
 
     /* ---------- Komponen dasar ---------- */
     .card {
-      background: var(--surface); border: 1px solid var(--border); border-radius: 20px; box-shadow: var(--shadow);
-      transition: transform .3s var(--ease), box-shadow .3s var(--ease), border-color .3s, background-color .35s;
+      background: color-mix(in srgb, var(--surface) 90%, transparent); border: 1px solid var(--border); border-radius: 22px; box-shadow: var(--shadow);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      transition: transform .35s var(--ease), box-shadow .35s var(--ease), border-color .3s, background-color .35s;
     }
-    .card-hover:hover { transform: translateY(-3px); border-color: var(--primary); }
+    .card-hover:hover { transform: translateY(-4px); border-color: var(--primary); box-shadow: 0 0 0 1px var(--primary), 0 22px 44px -20px var(--ring), var(--shadow); }
     .muted { color: var(--muted); } .faint { color: var(--faint); }
     .btn {
+      position: relative; overflow: hidden;
       display: inline-flex; align-items: center; gap: .4rem; font-weight: 600; font-size: .75rem; line-height: 1;
       padding: .6rem .9rem; border-radius: 12px; border: 1px solid transparent; cursor: pointer; white-space: nowrap;
       transition: transform .15s var(--ease), background-color .2s, border-color .2s, box-shadow .2s, color .2s;
     }
     .btn:active { transform: scale(.96); }
     .btn:disabled { opacity: .55; cursor: not-allowed; }
-    .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 6px 16px -6px var(--ring); }
-    .btn-primary:hover { background: var(--primary-h); }
-    html[data-theme="dark"] .btn-primary { color: #0a0f1e; }
+    .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary2)); color: #fff; box-shadow: 0 8px 20px -8px var(--ring), 0 0 16px -6px var(--primary); }
+    .btn-primary:hover { box-shadow: 0 12px 26px -8px var(--ring), 0 0 24px -4px var(--primary); transform: translateY(-1px); }
+    .btn-primary::after { content: ""; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,.45) 50%, transparent 70%); transform: translateX(-130%); transition: transform .7s var(--ease); pointer-events: none; }
+    .btn-primary:hover::after { transform: translateX(130%); }
+    html[data-theme="dark"] .btn-primary { color: #1a0630; }
     .btn-ok { background: var(--ok); color: #fff; } .btn-ok:hover { filter: brightness(1.08); }
     .btn-bad { background: var(--bad); color: #fff; } .btn-bad:hover { filter: brightness(1.08); }
-    html[data-theme="dark"] .btn-ok, html[data-theme="dark"] .btn-bad { color: #0a0f1e; }
-    .btn-dark { background: var(--mute); color: var(--surface); } .btn-dark:hover { filter: brightness(1.1); }
+    html[data-theme="dark"] .btn-ok, html[data-theme="dark"] .btn-bad { color: #1a0630; }
     .btn-soft { background: var(--surface2); color: var(--text); border-color: var(--border); }
-    .btn-soft:hover { border-color: var(--primary); color: var(--primary); }
+    .btn-soft:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-1px); }
     .btn-amber { background: var(--warn-soft); color: var(--warn); border-color: color-mix(in srgb, var(--warn) 30%, transparent); }
-    .btn-amber:hover { filter: brightness(.97); }
+    .btn-amber:hover { filter: brightness(.97); transform: translateY(-1px); }
     .btn-ghost { background: transparent; color: var(--muted); } .btn-ghost:hover { background: var(--surface2); color: var(--text); }
     .btn-icon { padding: .55rem; border-radius: 12px; }
+    .rip { position: absolute; border-radius: 50%; transform: scale(0); background: currentColor; opacity: .22; pointer-events: none; animation: rip .65s ease-out forwards; }
+    @keyframes rip { to { transform: scale(1); opacity: 0; } }
+
     .input {
       width: 100%; padding: .65rem .9rem; border-radius: 12px; background: var(--surface2); border: 1px solid var(--border);
       color: var(--text); font-size: .78rem; font-weight: 500; outline: none; transition: border-color .2s, box-shadow .2s, background-color .2s;
@@ -102,6 +145,50 @@
       font-family: ui-monospace, monospace; font-size: .62rem; font-weight: 600; padding: .12rem .38rem; border-radius: 6px;
       background: var(--surface2); border: 1px solid var(--border); color: var(--muted);
     }
+
+    /* Checkbox kustom */
+    .cb {
+      appearance: none; -webkit-appearance: none; width: 20px; height: 20px; border-radius: 7px; border: 2px solid var(--line);
+      background: var(--surface); display: inline-grid; place-content: center; cursor: pointer; flex-shrink: 0;
+      transition: background-color .2s, border-color .2s, transform .2s var(--ease), box-shadow .2s;
+    }
+    .cb:hover { border-color: var(--primary); box-shadow: 0 0 0 4px var(--ring); }
+    .cb:active { transform: scale(.88); }
+    .cb::after { content: ""; width: 10px; height: 6px; border-left: 2.5px solid #fff; border-bottom: 2.5px solid #fff; transform: rotate(-45deg) scale(0); margin-top: -2px; transition: transform .25s cubic-bezier(.34,1.56,.64,1); }
+    .cb:checked, .cb:indeterminate { background: linear-gradient(135deg, var(--primary), var(--primary2)); border-color: transparent; box-shadow: 0 0 12px -2px var(--primary); }
+    .cb:checked::after { transform: rotate(-45deg) scale(1); }
+    .cb:indeterminate::after { width: 9px; height: 0; border-left: 0; margin: 0; transform: none; }
+    html[data-theme="dark"] .cb:checked::after, html[data-theme="dark"] .cb:indeterminate::after { border-color: #1a0630; }
+
+    /* Stepper tahun */
+    .stepper { display: inline-flex; align-items: center; background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; transition: border-color .2s, box-shadow .2s; }
+    .stepper:focus-within { border-color: var(--primary); box-shadow: 0 0 0 4px var(--ring); }
+    .stepper button { width: 30px; height: 32px; display: grid; place-items: center; color: var(--muted); background: transparent; border: 0; cursor: pointer; transition: background-color .2s, color .2s, transform .15s; }
+    .stepper button:hover { background: var(--primary-soft); color: var(--primary); }
+    .stepper button:active { transform: scale(.85); }
+    .stepper input { width: 50px; text-align: center; background: transparent; border: 0; outline: none; font-size: .78rem; font-weight: 700; color: var(--text); }
+
+    /* Kalender kustom */
+    .dp-btn { display: flex; align-items: center; gap: .6rem; cursor: pointer; text-align: left; }
+    .dp-pop { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .4s var(--ease), margin .4s var(--ease); }
+    .dp-pop.open { grid-template-rows: 1fr; margin-top: .6rem; }
+    .dp-pop > div { overflow: hidden; min-height: 0; }
+    .dp-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 18px; padding: .8rem; }
+    .dp-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: .5rem; }
+    .dp-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+    .dp-dow { font-size: .62rem; font-weight: 800; color: var(--faint); text-align: center; padding: .3rem 0; text-transform: uppercase; }
+    .dp-day { aspect-ratio: 1; border-radius: 11px; font-size: .76rem; font-weight: 600; border: 0; background: transparent; color: var(--text); cursor: pointer; position: relative; transition: background-color .15s, color .15s, transform .15s; }
+    .dp-day:hover { background: var(--primary-soft); color: var(--primary); transform: scale(1.08); }
+    .dp-day.out { color: var(--faint); opacity: .55; }
+    .dp-day.today { box-shadow: inset 0 0 0 1.5px var(--primary); }
+    .dp-day.sel { background: linear-gradient(135deg, var(--primary), var(--primary2)); color: #fff; opacity: 1; box-shadow: 0 0 14px -2px var(--primary); }
+    html[data-theme="dark"] .dp-day.sel { color: #1a0630; }
+    .dp-day.has::after { content: ""; position: absolute; bottom: 4px; left: 50%; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: var(--warn); }
+
+    /* Tooltip kustom */
+    .tip { position: relative; display: inline-flex; }
+    .tip::before { content: attr(data-tip); position: absolute; top: calc(100% + 8px); right: 0; white-space: nowrap; font-size: .68rem; font-weight: 600; padding: .35rem .6rem; border-radius: 9px; background: var(--text); color: var(--surface); opacity: 0; transform: translateY(-4px); pointer-events: none; transition: opacity .2s, transform .2s; z-index: 50; }
+    .tip:hover::before { opacity: 1; transform: none; }
 
     /* Status chips */
     .chip { display: inline-flex; align-items: center; gap: .3rem; font-size: .68rem; font-weight: 700; padding: .28rem .6rem; border-radius: 9999px; border: 1px solid transparent; }
@@ -116,95 +203,107 @@
     /* Tombol status segmented */
     .seg { display: inline-flex; padding: 3px; gap: 2px; background: var(--surface2); border: 1px solid var(--border); border-radius: 14px; }
     .seg-btn {
+      position: relative; overflow: hidden;
       font-size: .72rem; font-weight: 600; padding: .45rem .7rem; border-radius: 10px; color: var(--muted); background: transparent;
       transition: background-color .22s var(--ease), color .22s, transform .15s, box-shadow .22s; cursor: pointer; border: 0;
     }
     .seg-btn:hover { background: var(--surface); color: var(--text); }
     .seg-btn:active { transform: scale(.92); }
-    .seg-btn.on-ok { background: var(--ok); color: #fff; box-shadow: 0 4px 10px -3px color-mix(in srgb, var(--ok) 60%, transparent); }
-    .seg-btn.on-warn { background: var(--warn); color: #fff; box-shadow: 0 4px 10px -3px color-mix(in srgb, var(--warn) 60%, transparent); }
-    .seg-btn.on-info { background: var(--info); color: #fff; box-shadow: 0 4px 10px -3px color-mix(in srgb, var(--info) 60%, transparent); }
-    .seg-btn.on-bad { background: var(--bad); color: #fff; box-shadow: 0 4px 10px -3px color-mix(in srgb, var(--bad) 60%, transparent); }
+    .seg-btn.on-ok { background: var(--ok); color: #fff; box-shadow: 0 4px 12px -3px color-mix(in srgb, var(--ok) 70%, transparent); }
+    .seg-btn.on-warn { background: var(--warn); color: #fff; box-shadow: 0 4px 12px -3px color-mix(in srgb, var(--warn) 70%, transparent); }
+    .seg-btn.on-info { background: var(--info); color: #fff; box-shadow: 0 4px 12px -3px color-mix(in srgb, var(--info) 70%, transparent); }
+    .seg-btn.on-bad { background: var(--bad); color: #fff; box-shadow: 0 4px 12px -3px color-mix(in srgb, var(--bad) 70%, transparent); }
     .seg-btn.on-mute { background: var(--mute); color: var(--surface); }
-    html[data-theme="dark"] .seg-btn[class*="on-"] { color: #0a0f1e; }
+    html[data-theme="dark"] .seg-btn[class*="on-"] { color: #1a0630; }
+    tr.flash .seg-btn[class*="on-"] { animation: pop .45s cubic-bezier(.34,1.56,.64,1); }
+    @keyframes pop { 0% { transform: scale(.7); } 100% { transform: scale(1); } }
 
     /* Pill filter */
-    .pill { font-size: .72rem; font-weight: 600; padding: .45rem .8rem; border-radius: 9999px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); cursor: pointer; transition: all .2s var(--ease); }
-    .pill:hover { border-color: var(--primary); color: var(--primary); }
-    .pill.active { background: var(--primary); border-color: var(--primary); color: #fff; }
-    html[data-theme="dark"] .pill.active { color: #0a0f1e; }
+    .pill { position: relative; overflow: hidden; font-size: .72rem; font-weight: 600; padding: .45rem .8rem; border-radius: 9999px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); cursor: pointer; transition: all .2s var(--ease); }
+    .pill:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-1px); }
+    .pill.active { background: linear-gradient(135deg, var(--primary), var(--primary2)); border-color: transparent; color: #fff; box-shadow: 0 0 16px -4px var(--primary); }
+    html[data-theme="dark"] .pill.active { color: #1a0630; }
     .pill .cnt { opacity: .75; margin-left: .25rem; font-weight: 700; }
+
+    /* Paginasi arsip */
+    .pg { min-width: 34px; height: 34px; padding: 0 .55rem; border-radius: 10px; font-size: .74rem; font-weight: 700; border: 1px solid var(--border); background: var(--surface); color: var(--muted); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all .2s var(--ease); }
+    .pg:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); transform: translateY(-1px); }
+    .pg.on { background: linear-gradient(135deg, var(--primary), var(--primary2)); border-color: transparent; color: #fff; box-shadow: 0 0 14px -3px var(--primary); }
+    html[data-theme="dark"] .pg.on { color: #1a0630; }
+    .pg:disabled { opacity: .4; cursor: not-allowed; }
 
     /* Navigasi */
     .nav-item {
       position: relative; width: 100%; display: flex; align-items: center; gap: .75rem; padding: .65rem .85rem; border-radius: 14px;
       font-size: .82rem; font-weight: 600; color: var(--muted); cursor: pointer; transition: background-color .25s var(--ease), color .25s, transform .2s;
     }
-    .nav-item:hover { background: var(--surface2); color: var(--text); transform: translateX(2px); }
+    .nav-item:hover { background: var(--surface2); color: var(--text); transform: translateX(3px); }
     .nav-item.active { background: var(--primary-soft); color: var(--primary); }
-    .nav-item.active::before { content: ""; position: absolute; left: -12px; top: 22%; bottom: 22%; width: 4px; border-radius: 0 4px 4px 0; background: var(--primary); }
+    .nav-item.active::before { content: ""; position: absolute; left: -12px; top: 22%; bottom: 22%; width: 4px; border-radius: 0 4px 4px 0; background: linear-gradient(var(--primary), var(--primary2)); box-shadow: 0 0 14px var(--primary); animation: navPop .4s var(--ease); }
+    @keyframes navPop { from { transform: scaleY(0); } to { transform: scaleY(1); } }
     .mnav { color: var(--faint); font-weight: 600; transition: color .2s, transform .2s; }
     .mnav.active { color: var(--primary); }
-    .mnav.active svg { transform: translateY(-2px) scale(1.1); }
+    .mnav.active svg { transform: translateY(-2px) scale(1.12); filter: drop-shadow(0 0 6px var(--primary)); }
     .mnav svg { transition: transform .25s var(--ease); }
 
-    .glass { background: color-mix(in srgb, var(--surface) 82%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+    .glass { background: color-mix(in srgb, var(--surface) 78%, transparent); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
 
     /* Animasi halaman */
-    .page-in { animation: pageIn .45s var(--ease) both; }
-    @keyframes pageIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
-    .stagger > * { animation: pageIn .5s var(--ease) both; }
-    .stagger > *:nth-child(1) { animation-delay: .02s; } .stagger > *:nth-child(2) { animation-delay: .07s; }
-    .stagger > *:nth-child(3) { animation-delay: .12s; } .stagger > *:nth-child(4) { animation-delay: .17s; }
-    .stagger > *:nth-child(5) { animation-delay: .22s; } .stagger > *:nth-child(6) { animation-delay: .27s; }
+    .page-in { animation: pageIn .5s var(--ease) both; }
+    @keyframes pageIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+    .stagger > * { animation: pageIn .55s var(--ease) both; }
+    .stagger > *:nth-child(1) { animation-delay: .02s; } .stagger > *:nth-child(2) { animation-delay: .08s; }
+    .stagger > *:nth-child(3) { animation-delay: .14s; } .stagger > *:nth-child(4) { animation-delay: .2s; }
+    .stagger > *:nth-child(5) { animation-delay: .26s; } .stagger > *:nth-child(6) { animation-delay: .32s; }
+    .row-in { animation: rowIn .45s var(--ease) both; animation-delay: calc(var(--i, 0) * 28ms); }
+    @keyframes rowIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+    #page-title { background: linear-gradient(90deg, var(--primary), var(--primary2), var(--cyan), var(--primary)); background-size: 220% auto; -webkit-background-clip: text; background-clip: text; color: transparent; animation: shine 7s linear infinite; }
+    @keyframes shine { to { background-position: 220% center; } }
 
     /* Progress bar atas */
-    #top-progress { position: fixed; top: 0; left: 0; height: 3px; width: 0; z-index: 100; background: linear-gradient(90deg, #6366f1, #0ea5e9, #10b981); border-radius: 0 3px 3px 0; opacity: 0; transition: width .4s var(--ease), opacity .3s; }
+    #top-progress { position: fixed; top: 0; left: 0; height: 3px; width: 0; z-index: 100; background: linear-gradient(90deg, #ff2d95, #8b5cf6, #22d3ee); box-shadow: 0 0 12px #ff2d95; border-radius: 0 3px 3px 0; opacity: 0; transition: width .4s var(--ease), opacity .3s; }
     #top-progress.on { opacity: 1; }
 
     /* Skeleton */
     .skeleton { position: relative; overflow: hidden; background: var(--surface2); border-radius: 12px; }
-    .skeleton::after { content: ""; position: absolute; inset: 0; transform: translateX(-100%); background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--surface) 70%, transparent), transparent); animation: shimmer 1.3s infinite; }
+    .skeleton::after { content: ""; position: absolute; inset: 0; transform: translateX(-100%); background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--primary) 18%, transparent), transparent); animation: shimmer 1.3s infinite; }
     @keyframes shimmer { 100% { transform: translateX(100%); } }
 
     /* Modal */
-    .modal { position: fixed; inset: 0; z-index: 70; display: flex; align-items: center; justify-content: center; padding: 1rem; background: rgba(8,12,28,.5); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .25s var(--ease), visibility .25s; }
+    .modal { position: fixed; inset: 0; z-index: 70; display: flex; align-items: center; justify-content: center; padding: 1rem; background: rgba(20,4,36,.55); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .25s var(--ease), visibility .25s; }
     .modal.open { opacity: 1; visibility: visible; pointer-events: auto; }
-    .modal-panel { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 24px; box-shadow: 0 30px 80px -20px rgba(0,0,0,.45); transform: translateY(18px) scale(.97); transition: transform .35s var(--ease); max-height: 92vh; overflow-y: auto; }
+    .modal-panel { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 26px; box-shadow: 0 30px 80px -20px rgba(0,0,0,.5), 0 0 40px -18px var(--primary); transform: translateY(24px) scale(.95); transition: transform .45s cubic-bezier(.34,1.3,.64,1); max-height: 92vh; overflow-y: auto; }
     .modal.open .modal-panel { transform: none; }
     .drawer { justify-content: flex-end; padding: 0; align-items: stretch; }
-    .drawer .modal-panel { max-width: 440px; height: 100%; max-height: 100vh; border-radius: 24px 0 0 24px; transform: translateX(100%); }
+    .drawer .modal-panel { max-width: 440px; height: 100%; max-height: 100vh; border-radius: 26px 0 0 26px; transform: translateX(100%); transition: transform .45s var(--ease); }
     .drawer.open .modal-panel { transform: none; }
     @media (max-width: 640px) { .drawer .modal-panel { border-radius: 0; } }
 
     /* Toast */
     #toast-box { position: fixed; z-index: 90; right: 1.25rem; bottom: 1.25rem; display: flex; flex-direction: column; gap: .5rem; align-items: flex-end; pointer-events: none; }
     @media (max-width: 1023px) { #toast-box { bottom: 4.75rem; right: .75rem; left: .75rem; align-items: stretch; } }
-    .toast { pointer-events: auto; display: flex; align-items: center; gap: .65rem; max-width: 380px; padding: .7rem .9rem; border-radius: 14px; font-size: .78rem; font-weight: 500; background: #0f172a; color: #fff; box-shadow: 0 18px 40px -12px rgba(0,0,0,.5); opacity: 0; transform: translateY(12px) scale(.96); transition: opacity .3s var(--ease), transform .3s var(--ease); }
-    html[data-theme="dark"] .toast { background: #e8ecf8; color: #0a0f1e; }
+    .toast { pointer-events: auto; display: flex; align-items: center; gap: .65rem; max-width: 380px; padding: .7rem .9rem; border-radius: 14px; font-size: .78rem; font-weight: 500; background: #240a3f; color: #fff; border: 1px solid rgba(255,79,168,.4); box-shadow: 0 18px 40px -12px rgba(0,0,0,.5), 0 0 22px -8px #ff4fa8; opacity: 0; transform: translateY(14px) scale(.94); transition: opacity .3s var(--ease), transform .4s cubic-bezier(.34,1.4,.64,1); }
+    html[data-theme="dark"] .toast { background: #fff0f8; color: #2a1038; }
     .toast.show { opacity: 1; transform: none; }
-    .toast .ic { width: 20px; height: 20px; border-radius: 9999px; display: grid; place-items: center; font-size: 11px; font-weight: 800; flex-shrink: 0; }
-    .toast-success .ic { background: #10b981; color: #fff; } .toast-error .ic { background: #f43f5e; color: #fff; } .toast-info .ic { background: #6366f1; color: #fff; }
-    .toast .act { font-weight: 700; color: #a5b4fc; cursor: pointer; background: none; border: 0; padding: .15rem .35rem; border-radius: 8px; }
-    html[data-theme="dark"] .toast .act { color: #4f46e5; }
+    .toast .ic { width: 20px; height: 20px; border-radius: 9999px; display: grid; place-items: center; flex-shrink: 0; }
+    .toast-success .ic { background: #10d9a0; color: #fff; } .toast-error .ic { background: #ff3d6e; color: #fff; } .toast-info .ic { background: #8b5cf6; color: #fff; }
+    .toast .act { font-weight: 700; color: #ff9ad0; cursor: pointer; background: none; border: 0; padding: .15rem .35rem; border-radius: 8px; }
+    html[data-theme="dark"] .toast .act { color: #d6197a; }
     .toast .act:hover { background: rgba(255,255,255,.12); }
 
     /* Tile aksi massal */
     .act-tile {
-      display: flex; align-items: center; gap: .7rem; padding: .7rem .85rem; border-radius: 16px; text-align: left; cursor: pointer;
+      position: relative; overflow: hidden;
+      display: flex; align-items: center; gap: .7rem; padding: .8rem .95rem; border-radius: 18px; text-align: left; cursor: pointer;
       background: var(--surface2); border: 1px solid var(--border); color: var(--text);
       transition: transform .25s var(--ease), border-color .2s, box-shadow .25s, background-color .2s;
     }
-    .act-tile:hover { transform: translateY(-2px); border-color: var(--c); box-shadow: 0 12px 24px -14px var(--c); }
+    .act-tile:hover { transform: translateY(-3px); border-color: var(--c); box-shadow: 0 14px 26px -14px var(--c); }
     .act-tile:active { transform: scale(.97); }
-    .act-tile .ic { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; font-size: 17px; flex-shrink: 0; background: color-mix(in srgb, var(--c) 14%, transparent); }
+    .act-tile .ic { width: 40px; height: 40px; border-radius: 13px; display: grid; place-items: center; flex-shrink: 0; color: var(--c); background: color-mix(in srgb, var(--c) 14%, transparent); transition: transform .35s cubic-bezier(.34,1.56,.64,1); }
+    .act-tile:hover .ic { transform: rotate(-8deg) scale(1.12); }
     .act-tile b { display: block; font-size: .78rem; font-weight: 800; line-height: 1.2; }
     .act-tile small { display: block; font-size: .66rem; font-weight: 500; color: var(--muted); margin-top: 2px; line-height: 1.25; }
-    .act-tile.primary { background: var(--primary); border-color: var(--primary); color: #fff; box-shadow: 0 10px 22px -12px var(--ring); }
-    .act-tile.primary small { color: rgba(255,255,255,.82); }
-    .act-tile.primary .ic { background: rgba(255,255,255,.2); }
-    html[data-theme="dark"] .act-tile.primary { color: #0a0f1e; }
-    html[data-theme="dark"] .act-tile.primary small { color: rgba(10,15,30,.75); }
 
     /* Dropdown kustom */
     .cs { position: relative; display: block; }
@@ -219,14 +318,14 @@
     #cs-pop {
       position: fixed; z-index: 95; display: none; padding: 6px; max-height: 320px; overflow-y: auto; overscroll-behavior: contain;
       background: var(--surface); border: 1px solid var(--border); border-radius: 18px;
-      box-shadow: 0 24px 60px -18px rgba(0,0,0,.42), 0 2px 6px rgba(0,0,0,.06);
+      box-shadow: 0 24px 60px -18px rgba(0,0,0,.5), 0 0 30px -14px var(--primary);
       opacity: 0; transform: translateY(-6px) scale(.98); transform-origin: top; transition: opacity .18s var(--ease), transform .25s var(--ease);
     }
     #cs-pop.measure { display: block; }
     #cs-pop.open { opacity: 1; transform: none; }
-    .cs-opt { display: flex; align-items: center; gap: .6rem; width: 100%; padding: .62rem .75rem; border-radius: 12px; font-size: .8rem; font-weight: 600; color: var(--text); text-align: left; cursor: pointer; border: 0; background: transparent; transition: background-color .15s; }
+    .cs-opt { display: flex; align-items: center; gap: .6rem; width: 100%; padding: .62rem .75rem; border-radius: 12px; font-size: .8rem; font-weight: 600; color: var(--text); text-align: left; cursor: pointer; border: 0; background: transparent; transition: background-color .15s, padding-left .2s var(--ease); }
     .cs-opt > span { flex: 1; min-width: 0; }
-    .cs-opt:hover, .cs-opt.hi { background: var(--surface2); }
+    .cs-opt:hover, .cs-opt.hi { background: var(--surface2); padding-left: 1rem; }
     .cs-opt.on { background: var(--primary-soft); color: var(--primary); }
     .cs-opt .ck { width: 16px; height: 16px; opacity: 0; flex-shrink: 0; }
     .cs-opt.on .ck { opacity: 1; }
@@ -241,7 +340,7 @@
     #cs-pop.sheet .cs-head i { display: block; width: 40px; height: 4px; border-radius: 9999px; background: var(--border); margin: 2px auto 12px; }
     #cs-pop.sheet .cs-head b { font-size: .95rem; font-weight: 800; }
     #cs-pop.sheet .cs-opt { padding: .85rem .9rem; font-size: .9rem; }
-    #cs-backdrop.dim { background: rgba(8,12,28,.5); backdrop-filter: blur(3px); }
+    #cs-backdrop.dim { background: rgba(20,4,36,.55); backdrop-filter: blur(3px); }
 
     /* Tabel kelola → kartu di mobile */
     @media (max-width: 767px) {
@@ -256,40 +355,44 @@
       .bulk-bar { max-width: calc(100vw - 1.5rem); gap: .45rem; padding-left: .9rem; }
     }
 
-    .cb { width: 17px; height: 17px; accent-color: var(--primary); cursor: pointer; border-radius: 5px; }
     .bulk-bar {
       position: fixed; left: 50%; bottom: 5.5rem; z-index: 60; display: flex; align-items: center; gap: .6rem;
       padding: .6rem .8rem .6rem 1.1rem; border-radius: 18px; background: var(--surface); border: 1px solid var(--primary);
-      box-shadow: 0 24px 50px -16px rgba(0,0,0,.45), 0 0 0 4px var(--ring);
+      box-shadow: 0 24px 50px -16px rgba(0,0,0,.5), 0 0 0 4px var(--ring), 0 0 30px -6px var(--primary);
       transform: translate(-50%, 30px) scale(.96); opacity: 0; pointer-events: none;
-      transition: transform .35s var(--ease), opacity .25s;
+      transition: transform .45s cubic-bezier(.34,1.4,.64,1), opacity .25s;
     }
     .bulk-bar.show { transform: translate(-50%, 0) scale(1); opacity: 1; pointer-events: auto; }
     @media (min-width: 1024px) { .bulk-bar { bottom: 2rem; margin-left: 134px; } }
 
     /* Hero */
-    .hero { position: relative; overflow: hidden; border-radius: 24px; color: #fff; background: linear-gradient(135deg, #4338ca 0%, #6366f1 45%, #0ea5e9 100%); box-shadow: 0 24px 50px -22px rgba(79,70,229,.7); }
-    .hero::before { content: ""; position: absolute; width: 340px; height: 340px; right: -90px; top: -120px; border-radius: 9999px; background: radial-gradient(circle, rgba(255,255,255,.28), transparent 65%); animation: float 9s ease-in-out infinite; }
-    .hero::after { content: ""; position: absolute; width: 260px; height: 260px; left: -80px; bottom: -130px; border-radius: 9999px; background: radial-gradient(circle, rgba(255,255,255,.16), transparent 65%); animation: float 12s ease-in-out infinite reverse; }
+    .hero { position: relative; overflow: hidden; border-radius: 26px; color: #fff; background: linear-gradient(120deg, #ff2d95, #c026d3, #7c3aed, #06b6d4, #ff2d95); background-size: 320% 320%; animation: gradShift 12s ease infinite; box-shadow: 0 24px 54px -22px rgba(255,45,149,.75), 0 0 40px -14px #8b5cf6; }
+    @keyframes gradShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+    .hero::before { content: ""; position: absolute; width: 340px; height: 340px; right: -90px; top: -120px; border-radius: 9999px; background: radial-gradient(circle, rgba(255,255,255,.32), transparent 65%); animation: float 9s ease-in-out infinite; }
+    .hero::after { content: ""; position: absolute; width: 260px; height: 260px; left: -80px; bottom: -130px; border-radius: 9999px; background: radial-gradient(circle, rgba(255,255,255,.18), transparent 65%); animation: float 12s ease-in-out infinite reverse; }
     @keyframes float { 50% { transform: translate(-18px, 16px) scale(1.06); } }
     .hero > * { position: relative; z-index: 1; }
-    .hero-btn { background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.28); color: #fff; backdrop-filter: blur(6px); }
-    .hero-btn:hover { background: rgba(255,255,255,.28); }
-    .hero-btn.solid { background: #fff; color: #3730a3; border-color: #fff; }
-    .hero-btn.solid:hover { background: #eef2ff; }
+    .hero-btn { background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.34); color: #fff; backdrop-filter: blur(6px); }
+    .hero-btn:hover { background: rgba(255,255,255,.3); }
+    .hero-btn.solid { background: #fff; color: #a21caf; border-color: #fff; }
+    .hero-btn.solid:hover { background: #fff0fa; }
+    .logo-pulse { animation: pulseRing 2.8s infinite; }
+    @keyframes pulseRing { 0% { box-shadow: 0 0 0 0 rgba(255,45,149,.55); } 70% { box-shadow: 0 0 0 14px rgba(255,45,149,0); } 100% { box-shadow: 0 0 0 0 rgba(255,45,149,0); } }
 
     /* Ring */
-    .ring-bg { stroke: var(--surface2); } .ring-fg { stroke: url(#ringGrad); transition: stroke-dashoffset 1s var(--ease); }
+    .ring-bg { stroke: var(--surface2); } .ring-fg { stroke: url(#ringGrad); transition: stroke-dashoffset 1.2s var(--ease); filter: drop-shadow(0 0 6px rgba(255,45,149,.6)); }
     .bar-track { height: 8px; border-radius: 9999px; background: var(--surface2); overflow: hidden; }
-    .bar-fill { height: 100%; border-radius: 9999px; transition: width .8s var(--ease); }
+    .bar-fill { height: 100%; border-radius: 9999px; transition: width .9s var(--ease); background-image: linear-gradient(90deg, transparent, rgba(255,255,255,.4), transparent); background-size: 60% 100%; background-repeat: no-repeat; animation: barShine 2.6s infinite; }
+    @keyframes barShine { from { background-position: -80% 0; } to { background-position: 180% 0; } }
 
-    .avatar { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; font-weight: 800; font-size: .78rem; flex-shrink: 0; background: hsl(var(--h) 80% 55% / .15); color: hsl(var(--h) 70% 45%); }
-    html[data-theme="dark"] .avatar { color: hsl(var(--h) 85% 72%); }
+    .avatar { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; font-weight: 800; font-size: .78rem; flex-shrink: 0; background: hsl(var(--h) 80% 55% / .16); color: hsl(var(--h) 70% 45%); transition: transform .3s cubic-bezier(.34,1.56,.64,1); }
+    tr.row:hover .avatar { transform: scale(1.1) rotate(-4deg); }
+    html[data-theme="dark"] .avatar { color: hsl(var(--h) 85% 74%); }
 
     tbody tr.row { transition: background-color .2s; }
-    tbody tr.row:hover { background: color-mix(in srgb, var(--primary) 5%, transparent); }
+    tbody tr.row:hover { background: color-mix(in srgb, var(--primary) 6%, transparent); }
     tr.flash { animation: flash 1.1s var(--ease); }
-    @keyframes flash { 0% { background: color-mix(in srgb, var(--primary) 22%, transparent); } 100% { background: transparent; } }
+    @keyframes flash { 0% { background: color-mix(in srgb, var(--primary) 26%, transparent); } 100% { background: transparent; } }
     .th { padding: .85rem 1rem; font-size: .65rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); background: var(--surface2); }
     .divide-b > tr + tr { border-top: 1px solid var(--border); }
 
@@ -301,7 +404,7 @@
       *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
     }
     @media print {
-      .no-print, #toast-box, #top-progress { display: none !important; }
+      .no-print, #toast-box, #top-progress, .aurora, .ticker, .burst { display: none !important; }
       html, body { background: #fff !important; color: #000 !important; background-image: none !important; }
       main { margin-left: 0 !important; padding: 0 !important; max-width: 100% !important; }
       .print-sheet { border: none !important; box-shadow: none !important; padding: 0 !important; max-width: 100% !important; width: 100% !important; border-radius: 0 !important; }
@@ -312,49 +415,47 @@
   <style id="page-style">@page { size: A4 portrait; margin: 12mm; }</style>
 </head>
 <body class="font-sans antialiased">
+  <div class="aurora no-print" id="stage"><i></i><i></i><i></i><b></b><b></b></div>
   <div id="top-progress"></div>
   <div id="toast-box" aria-live="polite"></div>
 
   <!-- ===================== LOGIN ===================== -->
   <div id="login-screen" class="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-    <div class="absolute -top-24 -left-20 w-96 h-96 rounded-full bg-indigo-500/20 blur-3xl"></div>
-    <div class="absolute -bottom-28 -right-16 w-96 h-96 rounded-full bg-sky-500/20 blur-3xl"></div>
-    <div class="card w-full max-w-md overflow-hidden page-in relative" style="border-radius:28px">
-      <div class="hero !rounded-none !shadow-none px-8 py-8 text-center">
+    <div class="card w-full max-w-md overflow-hidden page-in relative" style="border-radius:30px">
+      <div class="hero !rounded-none !shadow-none px-8 py-9 text-center">
         <div class="flex flex-col items-center">
-          <div class="w-[68px] h-[68px] rounded-2xl bg-white/15 border border-white/25 p-2.5 flex items-center justify-center mb-3 backdrop-blur">
+          <div class="logo-pulse w-[72px] h-[72px] rounded-2xl bg-white/15 border border-white/30 p-2.5 flex items-center justify-center mb-3 backdrop-blur">
             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Coat_of_arms_of_East_Java.svg/240px-Coat_of_arms_of_East_Java.svg.png" alt="Logo Jawa Timur" class="kop-logo w-full h-full object-contain">
           </div>
-          <span class="text-[10px] font-bold uppercase tracking-widest bg-white/15 border border-white/25 px-2.5 py-0.5 rounded-full">Portal Pengelola Presensi</span>
-          <h1 class="text-xl font-extrabold tracking-tight mt-2.5">SIM Absensi Upacara GTK</h1>
-          <p class="text-xs text-white/75 mt-0.5">SMK Negeri Tambakboyo • Kabupaten Tuban</p>
+          <span class="eq mb-2.5"><i></i><i></i><i></i><i></i><i></i></span>
+          <span class="text-[10px] font-bold uppercase tracking-widest bg-white/15 border border-white/30 px-2.5 py-0.5 rounded-full">Backstage Pass • Portal Admin</span>
+          <h1 class="text-2xl font-black tracking-tight mt-2.5">SIM Absensi Upacara GTK</h1>
+          <p class="text-xs text-white/80 mt-0.5">SMK Negeri Tambakboyo • Kabupaten Tuban</p>
         </div>
       </div>
       <form onsubmit="handleLogin(event)" class="p-7 sm:p-8 space-y-5">
         <div id="login-error" class="hidden p-3 rounded-xl st-bad text-xs font-semibold flex items-center gap-2">
-          <span>⚠️</span><span id="login-error-text">Username atau password salah.</span>
+          <i data-ic="alert"></i><span id="login-error-text">Username atau password salah.</span>
         </div>
         <div>
           <label class="lbl">Username Admin</label>
           <div class="relative">
             <input type="text" id="login-user" required autocomplete="username" placeholder="Masukkan username" class="input !pl-10 !py-3">
-            <svg class="w-4 h-4 faint absolute left-3.5 top-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+            <i data-ic="user" class="faint absolute left-3.5 top-3.5"></i>
           </div>
         </div>
         <div>
           <label class="lbl">Kata Sandi</label>
           <div class="relative">
             <input type="password" id="login-pass" required autocomplete="current-password" placeholder="••••••••" class="input !pl-10 !pr-11 !py-3">
-            <svg class="w-4 h-4 faint absolute left-3.5 top-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-            <button type="button" onclick="togglePassword()" class="absolute right-2.5 top-2.5 p-1 faint hover:text-indigo-500" title="Tampilkan / Sembunyikan">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-            </button>
+            <i data-ic="lock" class="faint absolute left-3.5 top-3.5"></i>
+            <button type="button" onclick="togglePassword()" class="absolute right-2.5 top-2.5 p-1 faint hover:text-pink-500" aria-label="Tampilkan atau sembunyikan sandi"><i data-ic="eye"></i></button>
           </div>
         </div>
         <button type="submit" id="btn-login-submit" class="btn btn-primary w-full justify-center !py-3.5 !text-sm">Masuk ke Sistem Admin</button>
         <div class="flex items-center justify-between text-[11px] faint pt-1">
           <span>Terhubung langsung dengan Google Apps Script</span>
-          <button type="button" onclick="toggleTheme()" class="btn btn-ghost !p-1.5" title="Ganti tema">🌓</button>
+          <button type="button" onclick="toggleTheme()" class="btn btn-ghost !p-1.5" aria-label="Ganti tema"><span class="theme-ic-m ico"></span></button>
         </div>
       </form>
     </div>
@@ -366,7 +467,7 @@
     <!-- Sidebar desktop -->
     <aside class="no-print fixed inset-y-0 left-0 w-[268px] glass border-r hidden lg:flex flex-col z-30" style="border-color:var(--border)">
       <div class="h-[68px] px-6 flex items-center gap-3" style="border-bottom:1px solid var(--border)">
-        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500 to-sky-500 text-white font-extrabold text-xs flex items-center justify-center shadow-lg shadow-indigo-500/30">GTK</div>
+        <div class="logo-pulse w-10 h-10 rounded-2xl bg-gradient-to-br from-pink-500 to-violet-500 text-white font-extrabold text-xs flex items-center justify-center shadow-lg shadow-pink-500/30">GTK</div>
         <div class="min-w-0">
           <h1 class="font-extrabold text-sm tracking-tight truncate">SIM Upacara GTK</h1>
           <p class="text-[11px] font-medium muted truncate">SMK Negeri Tambakboyo</p>
@@ -374,32 +475,32 @@
       </div>
 
       <div class="flex-1 px-3.5 py-5 space-y-1 overflow-y-auto">
-        <button onclick="openPalette()" class="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-xs muted mb-3 transition hover:border-indigo-400" style="background:var(--surface2);border:1px solid var(--border)">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z"/></svg>
+        <button onclick="openPalette()" class="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-xs muted mb-3 transition hover:border-pink-400" style="background:var(--surface2);border:1px solid var(--border)">
+          <i data-ic="search" data-cls="w-3.5 h-3.5"></i>
           <span class="flex-1 text-left">Cari cepat…</span><span class="kbd">Ctrl K</span>
         </button>
         <p class="px-3 text-[10px] font-extrabold uppercase tracking-widest faint mb-2">Menu Pengelola</p>
         <button onclick="switchPage('dashboard')" id="side-dashboard" class="nav-item active">
-          <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+          <i data-ic="grid" data-cls="w-[18px] h-[18px]"></i>
           <span class="flex-1 text-left">Dashboard</span><span class="kbd">Alt 1</span>
         </button>
         <button onclick="switchPage('kelola')" id="side-kelola" class="nav-item">
-          <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <i data-ic="check-circle" data-cls="w-[18px] h-[18px]"></i>
           <span class="flex-1 text-left">Kelola Absensi & TTD</span><span class="kbd">Alt 2</span>
         </button>
         <button onclick="switchPage('laporan')" id="side-laporan" class="nav-item">
-          <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+          <i data-ic="printer" data-cls="w-[18px] h-[18px]"></i>
           <span class="flex-1 text-left">Laporan & Cetak</span><span class="kbd">Alt 3</span>
         </button>
         <button onclick="switchPage('arsip')" id="side-arsip" class="nav-item">
-          <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
+          <i data-ic="archive" data-cls="w-[18px] h-[18px]"></i>
           <span class="flex-1 text-left">Arsip Bulanan</span><span class="kbd">Alt 4</span>
         </button>
 
         <div class="pt-4 mt-4" style="border-top:1px solid var(--border)">
           <p class="px-3 text-[10px] font-extrabold uppercase tracking-widest faint mb-2">Aksi Cepat</p>
-          <button onclick="openSpecialModal()" class="btn btn-amber w-full !py-2.5">📅 Tambah Hari Khusus</button>
-          <button onclick="exportCSV()" class="btn btn-soft w-full !py-2.5 mt-2">⬇️ Ekspor Rekap (CSV)</button>
+          <button onclick="openSpecialModal()" class="btn btn-amber w-full !py-2.5"><i data-ic="calendar"></i> Tambah Hari Khusus</button>
+          <button onclick="exportExcel()" class="btn btn-soft w-full !py-2.5 mt-2"><i data-ic="sheet"></i> Ekspor ke Excel</button>
         </div>
       </div>
 
@@ -413,7 +514,7 @@
           <p class="text-[10.5px] muted mt-0.5 flex items-center gap-1.5"><span id="sync-dot" class="w-1.5 h-1.5 rounded-full bg-amber-400"></span><span id="sync-label">Belum sinkron</span></p>
         </div>
         <div class="flex gap-2">
-          <button onclick="toggleTheme()" class="btn btn-soft flex-1 justify-center" title="Ganti tema (terang/gelap)"><span id="theme-ic">🌙</span> Tema</button>
+          <button onclick="toggleTheme()" class="btn btn-soft flex-1 justify-center"><span id="theme-ic" class="ico"></span> Tema</button>
           <button onclick="handleLogout()" class="btn btn-soft flex-1 justify-center hover:!text-rose-500">Keluar</button>
         </div>
       </div>
@@ -422,33 +523,35 @@
     <!-- Topbar mobile -->
     <header class="no-print lg:hidden sticky top-0 z-30 glass px-4 h-14 flex items-center justify-between" style="border-bottom:1px solid var(--border)">
       <div class="flex items-center gap-2.5">
-        <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-sky-500 text-white font-extrabold text-[11px] flex items-center justify-center">GTK</div>
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-pink-500 to-violet-500 text-white font-extrabold text-[11px] flex items-center justify-center">GTK</div>
         <div>
           <h1 class="font-extrabold text-sm leading-none">SIM Upacara GTK</h1>
           <span id="mobile-periode" class="text-[10px] font-medium muted">SMKN Tambakboyo</span>
         </div>
       </div>
       <div class="flex items-center gap-1">
-        <button onclick="openPalette()" class="btn btn-ghost btn-icon" title="Cari">🔍</button>
-        <button onclick="toggleTheme()" class="btn btn-ghost btn-icon" title="Tema"><span class="theme-ic-m">🌙</span></button>
+        <button onclick="openPalette()" class="btn btn-ghost btn-icon" aria-label="Cari"><i data-ic="search"></i></button>
+        <button onclick="toggleTheme()" class="btn btn-ghost btn-icon" aria-label="Tema"><span class="theme-ic-m ico"></span></button>
         <button onclick="openSpecialModal()" class="btn btn-amber !px-2.5 !py-1.5">+ Khusus</button>
         <button onclick="handleLogout()" class="btn btn-soft !px-2.5 !py-1.5">Keluar</button>
       </div>
     </header>
 
     <nav class="no-print lg:hidden fixed bottom-0 inset-x-0 glass grid grid-cols-4 text-[11px] z-30" style="border-top:1px solid var(--border)">
-      <button onclick="switchPage('dashboard')" id="mob-dashboard" class="mnav active py-2.5 flex flex-col items-center gap-1"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>Dashboard</button>
-      <button onclick="switchPage('kelola')" id="mob-kelola" class="mnav py-2.5 flex flex-col items-center gap-1"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Absensi</button>
-      <button onclick="switchPage('laporan')" id="mob-laporan" class="mnav py-2.5 flex flex-col items-center gap-1"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>Laporan</button>
-      <button onclick="switchPage('arsip')" id="mob-arsip" class="mnav py-2.5 flex flex-col items-center gap-1"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>Arsip</button>
+      <button onclick="switchPage('dashboard')" id="mob-dashboard" class="mnav active py-2.5 flex flex-col items-center gap-1"><i data-ic="grid" data-cls="w-5 h-5"></i>Dashboard</button>
+      <button onclick="switchPage('kelola')" id="mob-kelola" class="mnav py-2.5 flex flex-col items-center gap-1"><i data-ic="check-circle" data-cls="w-5 h-5"></i>Absensi</button>
+      <button onclick="switchPage('laporan')" id="mob-laporan" class="mnav py-2.5 flex flex-col items-center gap-1"><i data-ic="printer" data-cls="w-5 h-5"></i>Laporan</button>
+      <button onclick="switchPage('arsip')" id="mob-arsip" class="mnav py-2.5 flex flex-col items-center gap-1"><i data-ic="archive" data-cls="w-5 h-5"></i>Arsip</button>
     </nav>
 
     <!-- ===================== WORKSPACE ===================== -->
     <main class="lg:ml-[268px] p-4 sm:p-6 lg:p-8 pb-28 lg:pb-10 max-w-[1440px]">
 
+      <div class="ticker no-print mb-5"><div id="ticker-track" class="ticker-track"></div></div>
+
       <div class="no-print flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6">
         <div>
-          <h2 id="page-title" class="text-2xl sm:text-[28px] font-extrabold tracking-tight">Dashboard</h2>
+          <h2 id="page-title" class="text-2xl sm:text-[32px] font-black tracking-tight">Dashboard</h2>
           <p id="page-sub" class="text-xs sm:text-sm muted mt-0.5">Ringkasan kehadiran upacara bulan ini</p>
         </div>
         <div class="card flex flex-wrap items-center gap-2 !rounded-2xl px-3 py-2 self-start sm:self-auto">
@@ -458,10 +561,16 @@
             <option>Mei</option><option>Juni</option><option>Juli</option><option>Agustus</option>
             <option>September</option><option>Oktober</option><option>November</option><option>Desember</option>
           </select>
-          <input type="number" id="inp-tahun" onchange="ubahPeriode()" class="input !w-[84px] !py-1.5 !px-2.5 !text-xs">
-          <button onclick="loadWorkbook(true)" id="btn-sync" title="Sinkronkan ulang" class="btn btn-ghost btn-icon"> <option>Sinkronisasi</option>
-            <svg id="sync-ic" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-          </button>
+          <div class="stepper">
+            <button type="button" onclick="stepTahun(-1)" aria-label="Tahun sebelumnya"><i data-ic="minus" data-cls="w-3.5 h-3.5"></i></button>
+            <input type="text" id="inp-tahun" inputmode="numeric" maxlength="4" onchange="ubahPeriode()">
+            <button type="button" onclick="stepTahun(1)" aria-label="Tahun berikutnya"><i data-ic="plus" data-cls="w-3.5 h-3.5"></i></button>
+          </div>
+          <span class="tip" data-tip="Sinkronkan ulang">
+            <button onclick="loadWorkbook(true)" id="btn-sync" class="btn btn-ghost btn-icon" aria-label="Sinkronkan ulang">
+              <svg id="sync-ic" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.5 9a9 9 0 0114.9-3.4L23 10M1 14l4.6 4.4A9 9 0 0020.5 15"/></svg>
+            </button>
+          </span>
         </div>
       </div>
 
@@ -471,22 +580,25 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
           <div class="hero lg:col-span-8 p-6 sm:p-7 flex flex-col justify-between gap-6 min-h-[230px]">
             <div class="flex flex-wrap items-center justify-between gap-2">
-              <span id="hero-badge" class="text-[10px] font-extrabold uppercase tracking-widest bg-white/15 border border-white/25 px-3 py-1 rounded-full">Upacara Berikutnya</span>
-              <span id="hero-count" class="text-xs font-bold bg-white text-indigo-700 px-3 py-1 rounded-full">—</span>
+              <span id="hero-badge" class="text-[10px] font-extrabold uppercase tracking-widest bg-white/15 border border-white/30 px-3 py-1 rounded-full">Upacara Berikutnya</span>
+              <div class="flex items-center gap-2.5">
+                <span class="eq"><i></i><i></i><i></i><i></i><i></i></span>
+                <span id="hero-count" class="text-xs font-bold bg-white text-fuchsia-700 px-3 py-1 rounded-full">—</span>
+              </div>
             </div>
             <div>
-              <h3 id="hero-title" class="text-xl sm:text-2xl font-extrabold tracking-tight leading-snug">Memuat jadwal…</h3>
-              <p id="hero-date" class="text-sm text-white/80 mt-1">—</p>
+              <h3 id="hero-title" class="text-xl sm:text-3xl font-black tracking-tight leading-snug">Memuat jadwal…</h3>
+              <p id="hero-date" class="text-sm text-white/85 mt-1">—</p>
             </div>
             <div>
               <div class="flex items-center justify-between text-xs font-semibold mb-1.5 text-white/90">
                 <span>Progres pengisian absensi</span><span id="hero-prog-text">0 / 0</span>
               </div>
-              <div class="h-2 rounded-full bg-white/20 overflow-hidden"><div id="hero-prog" class="h-full rounded-full bg-white" style="width:0;transition:width .9s cubic-bezier(.22,1,.36,1)"></div></div>
+              <div class="h-2 rounded-full bg-white/25 overflow-hidden"><div id="hero-prog" class="h-full rounded-full bg-white" style="width:0;transition:width .9s cubic-bezier(.22,1,.36,1);box-shadow:0 0 12px #fff"></div></div>
               <div class="flex flex-wrap gap-2 mt-4">
-                <button onclick="heroAbsen()" class="btn hero-btn solid">✍️ Mulai Absen</button>
-                <button onclick="heroCetak()" class="btn hero-btn">🖨️ Cetak Daftar Hadir</button>
-                <button onclick="openSpecialModal()" class="btn hero-btn">+ Hari Khusus</button>
+                <button onclick="heroAbsen()" class="btn hero-btn solid"><i data-ic="pen"></i> Mulai Absen</button>
+                <button onclick="heroCetak()" class="btn hero-btn"><i data-ic="printer"></i> Cetak Daftar Hadir</button>
+                <button onclick="openSpecialModal()" class="btn hero-btn"><i data-ic="plus"></i> Hari Khusus</button>
               </div>
             </div>
           </div>
@@ -494,12 +606,12 @@
           <div class="card lg:col-span-4 p-6 flex items-center gap-5">
             <div class="relative w-[128px] h-[128px] shrink-0">
               <svg viewBox="0 0 120 120" class="w-full h-full -rotate-90">
-                <defs><linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#10b981"/></linearGradient></defs>
+                <defs><linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ff2d95"/><stop offset="100%" stop-color="#22d3ee"/></linearGradient></defs>
                 <circle class="ring-bg" cx="60" cy="60" r="52" fill="none" stroke-width="11"/>
                 <circle id="ring-fg" class="ring-fg" cx="60" cy="60" r="52" fill="none" stroke-width="11" stroke-linecap="round" stroke-dasharray="326.73" stroke-dashoffset="326.73"/>
               </svg>
               <div class="absolute inset-0 flex flex-col items-center justify-center">
-                <span id="kpi-persen" class="text-2xl font-extrabold tracking-tight">0%</span>
+                <span id="kpi-persen" class="text-2xl font-black tracking-tight">0%</span>
                 <span class="text-[10px] font-bold uppercase tracking-wider faint">Hadir</span>
               </div>
             </div>
@@ -517,24 +629,24 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 stagger">
           <div class="card card-hover p-5">
-            <div class="flex items-center justify-between"><span class="text-xs font-bold muted">Total GTK</span><div class="w-9 h-9 rounded-xl st-pri flex items-center justify-center">👥</div></div>
-            <p id="kpi-total-gtk" class="text-3xl font-extrabold mt-3 tracking-tight">0</p>
+            <div class="flex items-center justify-between"><span class="text-xs font-bold muted">Total GTK</span><div class="w-9 h-9 rounded-xl st-pri flex items-center justify-center"><i data-ic="users" data-cls="w-[18px] h-[18px]"></i></div></div>
+            <p id="kpi-total-gtk" class="text-3xl font-black mt-3 tracking-tight">0</p>
             <p id="kpi-gender" class="text-xs muted mt-1">Laki-laki: 0 • Perempuan: 0</p>
           </div>
           <div class="card card-hover p-5">
-            <div class="flex items-center justify-between"><span class="text-xs font-bold muted">Akumulasi Hadir</span><div class="w-9 h-9 rounded-xl st-ok flex items-center justify-center">✅</div></div>
-            <p id="kpi-hadir" class="text-3xl font-extrabold mt-3 tracking-tight" style="color:var(--ok)">0</p>
+            <div class="flex items-center justify-between"><span class="text-xs font-bold muted">Akumulasi Hadir</span><div class="w-9 h-9 rounded-xl st-ok flex items-center justify-center"><i data-ic="check-circle" data-cls="w-[18px] h-[18px]"></i></div></div>
+            <p id="kpi-hadir" class="text-3xl font-black mt-3 tracking-tight" style="color:var(--ok)">0</p>
             <p class="text-xs muted mt-1">Total tanda tangan hadir</p>
           </div>
           <div class="card card-hover p-5">
-            <div class="flex items-center justify-between"><span class="text-xs font-bold muted">Tidak Hadir</span><div class="w-9 h-9 rounded-xl st-bad flex items-center justify-center">⚠️</div></div>
-            <p id="kpi-tidak-hadir" class="text-3xl font-extrabold mt-3 tracking-tight" style="color:var(--bad)">0</p>
+            <div class="flex items-center justify-between"><span class="text-xs font-bold muted">Tidak Hadir</span><div class="w-9 h-9 rounded-xl st-bad flex items-center justify-center"><i data-ic="alert" data-cls="w-[18px] h-[18px]"></i></div></div>
+            <p id="kpi-tidak-hadir" class="text-3xl font-black mt-3 tracking-tight" style="color:var(--bad)">0</p>
             <p id="kpi-rincian-absen" class="text-xs muted mt-1">Sakit: 0 • Izin: 0 • Alpa: 0</p>
           </div>
           <div class="card card-hover p-5">
-            <div class="flex items-center justify-between"><span class="text-xs font-bold muted">TTD Asli Tersimpan</span><div class="w-9 h-9 rounded-xl st-info flex items-center justify-center">✍️</div></div>
-            <p id="kpi-ttd-count" class="text-3xl font-extrabold mt-3 tracking-tight">0</p>
-            <div class="bar-track mt-2.5"><div id="kpi-ttd-bar" class="bar-fill" style="width:0;background:var(--info)"></div></div>
+            <div class="flex items-center justify-between"><span class="text-xs font-bold muted">TTD Asli Tersimpan</span><div class="w-9 h-9 rounded-xl st-info flex items-center justify-center"><i data-ic="pen" data-cls="w-[18px] h-[18px]"></i></div></div>
+            <p id="kpi-ttd-count" class="text-3xl font-black mt-3 tracking-tight">0</p>
+            <div class="bar-track mt-2.5"><div id="kpi-ttd-bar" class="bar-fill" style="width:0;background-color:var(--info)"></div></div>
           </div>
         </div>
 
@@ -544,9 +656,9 @@
               <h3 class="font-extrabold text-sm">Jadwal Upacara Bulan Ini</h3>
               <p class="text-xs muted">Otomatis setiap hari Senin + hari besar yang ditambahkan</p>
             </div>
-            <button onclick="openSpecialModal()" class="btn btn-amber">+ Tambah Hari Khusus</button>
+            <button onclick="openSpecialModal()" class="btn btn-amber"><i data-ic="plus"></i> Tambah Hari Khusus</button>
           </div>
-          <div id="jadwal-cards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3"></div>
+          <div id="jadwal-cards" class="stagger grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3"></div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
@@ -590,18 +702,18 @@
             <div class="md:col-span-5">
               <label class="lbl">Tanggal & Agenda Upacara <span class="kbd ml-1">[</span><span class="kbd ml-0.5">]</span></label>
               <div class="flex gap-2">
-                <button onclick="shiftTanggal(-1)" class="btn btn-soft btn-icon" title="Sebelumnya">‹</button>
+                <button onclick="shiftTanggal(-1)" class="btn btn-soft btn-icon" aria-label="Sebelumnya"><i data-ic="chev-l"></i></button>
                 <select id="select-tanggal" onchange="syncTanggalSelectors(this.value)" class="input flex-1 !font-bold"></select>
-                <button onclick="shiftTanggal(1)" class="btn btn-soft btn-icon" title="Berikutnya">›</button>
+                <button onclick="shiftTanggal(1)" class="btn btn-soft btn-icon" aria-label="Berikutnya"><i data-ic="chev-r"></i></button>
               </div>
             </div>
             <div class="md:col-span-4">
               <label class="lbl">Cari Nama / Jabatan <span class="kbd ml-1">/</span></label>
-              <input type="text" id="search-gtk" oninput="renderKelolaList()" placeholder="Ketik nama atau jabatan…" class="input">
+              <input type="text" id="search-gtk" oninput="renderKelolaList(true)" placeholder="Ketik nama atau jabatan…" class="input">
             </div>
             <div class="md:col-span-3">
               <label class="lbl">Kepegawaian</label>
-              <select id="filter-kepeg" onchange="renderKelolaList()" class="input"></select>
+              <select id="filter-kepeg" onchange="renderKelolaList(true)" class="input"></select>
             </div>
           </div>
 
@@ -620,18 +732,12 @@
               <button class="pill" data-f="SI" onclick="setStatusFilter('SI')">Sakit/Izin<span class="cnt" id="tgl-si">0</span></button>
               <button class="pill" data-f="ALPA" onclick="setStatusFilter('ALPA')">Alpa<span class="cnt" id="tgl-alpa">0</span></button>
             </div>
-            <div class="grid grid-cols-2 xl:grid-cols-4 gap-2.5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <button onclick="aksiMassal('TANPA KETERANGAN', true)" class="act-tile" style="--c:var(--bad)">
-                <span class="ic">⚠️</span><span class="min-w-0"><b>Tandai Sisa Alpa</b><small>Yang belum diisi → Alpa</small></span>
+                <span class="ic"><i data-ic="alert" data-cls="w-5 h-5"></i></span><span class="min-w-0"><b>Tandai Sisa Alpa</b><small>Yang belum diisi → Alpa</small></span>
               </button>
               <button onclick="aksiMassal('LIBUR UPACARA', false)" class="act-tile" style="--c:var(--mute)">
-                <span class="ic">🏖️</span><span class="min-w-0"><b>Libur Upacara</b><small>Liburkan semua GTK</small></span>
-              </button>
-              <button onclick="copyRekapWA()" class="act-tile" style="--c:var(--ok)">
-                <span class="ic">💬</span><span class="min-w-0"><b>Salin Laporan WA</b><small>Rekap siap dikirim</small></span>
-              </button>
-              <button onclick="switchPage('laporan')" class="act-tile primary" style="--c:var(--primary)">
-                <span class="ic">🖨️</span><span class="min-w-0"><b>Cetak Laporan</b><small>Daftar hadir / PDF →</small></span>
+                <span class="ic"><i data-ic="umbrella" data-cls="w-5 h-5"></i></span><span class="min-w-0"><b>Libur Upacara</b><small>Liburkan semua GTK</small></span>
               </button>
             </div>
           </div>
@@ -645,7 +751,7 @@
             <table class="kelola-table w-full text-left border-collapse">
               <thead>
                 <tr>
-                  <th class="th w-12 text-center"><input type="checkbox" id="sel-all" class="cb" title="Pilih semua yang tampil" onchange="toggleSelectAll(this.checked)"></th>
+                  <th class="th w-12 text-center"><input type="checkbox" id="sel-all" class="cb" aria-label="Pilih semua yang tampil" onchange="toggleSelectAll(this.checked)"></th>
                   <th class="th w-14 text-center">No</th>
                   <th class="th min-w-[250px]">Nama & Jabatan</th>
                   <th class="th w-52 text-center hidden md:table-cell">Paraf / Status</th>
@@ -675,9 +781,9 @@
             </div>
           </div>
           <div class="flex flex-wrap items-center gap-2">
-            <label class="btn btn-soft cursor-pointer" title="Ganti gambar logo kop surat">🖼️ Ganti Logo<input type="file" accept="image/*" onchange="gantiLogoKop(event)" class="hidden"></label>
-            <button onclick="exportCSV()" class="btn btn-soft">⬇️ CSV</button>
-            <button onclick="window.print()" class="btn btn-primary !px-5 !py-2.5">🖨️ Cetak / Simpan PDF</button>
+            <label class="btn btn-soft cursor-pointer"><i data-ic="image"></i> Ganti Logo<input type="file" accept="image/*" onchange="gantiLogoKop(event)" class="hidden"></label>
+            <button onclick="exportExcel()" class="btn btn-soft"><i data-ic="sheet"></i> Excel</button>
+            <button onclick="window.print()" class="btn btn-primary !px-5 !py-2.5"><i data-ic="printer"></i> Cetak / Simpan PDF</button>
           </div>
         </div>
 
@@ -720,15 +826,37 @@
 
       <!-- ============ 4. ARSIP ============ -->
       <section id="page-arsip" class="hidden space-y-5">
-        <div class="card p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <h3 class="font-extrabold text-sm">Arsip Riwayat Presensi Bulanan</h3>
-            <p class="text-xs muted mt-0.5">Pilih bulan untuk menyaring data dari tab sheet ARSIP ABSENSI</p>
+        <div class="card p-4 sm:p-5 space-y-4">
+          <div class="flex items-center gap-3">
+            <span class="w-10 h-10 rounded-2xl st-pri grid place-items-center"><i data-ic="archive" data-cls="w-5 h-5"></i></span>
+            <div>
+              <h3 class="font-extrabold text-sm">Arsip Riwayat Presensi Bulanan</h3>
+              <p class="text-xs muted mt-0.5">Data dari tab sheet ARSIP ABSENSI, ditampilkan per halaman</p>
+            </div>
           </div>
-          <div class="flex flex-col sm:flex-row gap-2">
-            <select id="sel-arsip-periode" data-title="Filter Bulan Arsip" onchange="renderArsip()" class="input sm:!w-auto"></select>
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+            <div class="sm:col-span-4">
+              <label class="lbl">Periode</label>
+              <select id="sel-arsip-periode" data-title="Filter Bulan Arsip" onchange="arsipPage=1;renderArsip()" class="input"></select>
+            </div>
+            <div class="sm:col-span-5">
+              <label class="lbl">Cari nama atau nomor</label>
+              <div class="relative">
+                <i data-ic="search" class="faint absolute left-3 top-1/2 -translate-y-1/2"></i>
+                <input type="text" id="arsip-search" oninput="arsipPage=1;renderArsip()" placeholder="Ketik nama GTK…" class="input !pl-9">
+              </div>
+            </div>
+            <div class="sm:col-span-3">
+              <label class="lbl">Baris per halaman</label>
+              <select id="sel-arsip-size" data-title="Baris per halaman" onchange="arsipPage=1;renderArsip()" class="input">
+                <option value="10">10 baris</option><option value="15" selected>15 baris</option><option value="25">25 baris</option><option value="50">50 baris</option>
+              </select>
+            </div>
           </div>
         </div>
+
+        <div id="arsip-stats" class="grid grid-cols-2 lg:grid-cols-4 gap-3"></div>
+
         <div class="card overflow-hidden">
           <div class="overflow-x-auto">
             <table class="w-full text-xs text-left whitespace-nowrap border-collapse">
@@ -736,11 +864,13 @@
                 <tr>
                   <th class="th">Periode</th><th class="th w-14">No</th><th class="th">Nama Lengkap GTK</th>
                   <th class="th">Senin 1</th><th class="th">Senin 2</th><th class="th">Senin 3</th><th class="th">Senin 4</th><th class="th">Senin 5</th>
+                  <th class="th">Kehadiran</th>
                 </tr>
               </thead>
               <tbody id="arsip-tbody" class="divide-b"></tbody>
             </table>
           </div>
+          <div id="arsip-pager" class="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3" style="border-top:1px solid var(--border)"></div>
         </div>
       </section>
     </main>
@@ -753,7 +883,7 @@
   <!-- ============ BAR AKSI CENTANG MASSAL ============ -->
   <div id="bulk-bar" class="bulk-bar no-print">
     <span class="text-xs font-bold"><span id="bulk-count">0</span> GTK dipilih</span>
-    <button onclick="bulkHadirSelected()" class="btn btn-ok">✅ Tandai Hadir</button>
+    <button onclick="bulkHadirSelected()" class="btn btn-ok"><i data-ic="check-circle"></i> Tandai Hadir</button>
     <button onclick="clearSelection()" class="btn btn-soft">Batal</button>
   </div>
 
@@ -765,12 +895,27 @@
           <span class="chip st-warn">Jadwal Upacara Khusus</span>
           <h3 class="font-extrabold text-base mt-2">Tambah Hari Khusus Upacara</h3>
         </div>
-        <button onclick="closeModal('special-modal')" class="btn btn-ghost btn-icon">✕</button>
+        <button onclick="closeModal('special-modal')" class="btn btn-ghost btn-icon" aria-label="Tutup"><i data-ic="x"></i></button>
       </div>
       <form onsubmit="submitSpecialCeremony(event)" class="space-y-4">
         <div>
           <label class="lbl">Tanggal Pelaksanaan</label>
-          <input type="date" id="inp-special-date" required class="input">
+          <input type="hidden" id="inp-special-date">
+          <button type="button" class="input dp-btn" onclick="toggleDP()">
+            <i data-ic="calendar" class="faint"></i><span id="dp-label" class="flex-1 faint">Pilih tanggal</span>
+            <span id="dp-chev" class="ico" style="transition:transform .3s var(--ease)"><i data-ic="chev-d" class="faint"></i></span>
+          </button>
+          <div id="dp-pop" class="dp-pop"><div>
+            <div class="dp-card">
+              <div class="dp-head">
+                <button type="button" class="btn btn-ghost btn-icon !p-1.5" onclick="dpNav(-1)" aria-label="Bulan sebelumnya"><i data-ic="chev-l"></i></button>
+                <b id="dp-title" class="text-xs font-extrabold"></b>
+                <button type="button" class="btn btn-ghost btn-icon !p-1.5" onclick="dpNav(1)" aria-label="Bulan berikutnya"><i data-ic="chev-r"></i></button>
+              </div>
+              <div id="dp-grid" class="dp-grid"></div>
+              <p class="text-[10px] faint mt-2 flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full" style="background:var(--warn)"></span> Titik kuning: tanggal sudah ada di jadwal upacara</p>
+            </div>
+          </div></div>
         </div>
         <div>
           <label class="lbl">Nama / Peringatan Upacara</label>
@@ -783,7 +928,7 @@
             <button type="button" class="pill !text-[10.5px] !py-1" onclick="setQuickSpecial('UPACARA HARI SUMPAH PEMUDA','10-28')">28 Okt · Sumpah Pemuda</button>
             <button type="button" class="pill !text-[10.5px] !py-1" onclick="setQuickSpecial('UPACARA HARI GURU NASIONAL','11-25')">25 Nov · Hari Guru</button>
           </div>
-          <p class="text-[10.5px] faint mt-2">Tombol cepat mengisi nama dan menyesuaikan tanggal ke bulan/tahun periode aktif.</p>
+          <p class="text-[10.5px] faint mt-2">Tombol cepat mengisi nama dan menyesuaikan tanggal ke tahun periode aktif.</p>
         </div>
         <div class="flex gap-2.5 pt-1">
           <button type="button" onclick="closeModal('special-modal')" class="btn btn-soft flex-1 justify-center !py-2.5">Batal</button>
@@ -801,18 +946,20 @@
           <span class="chip st-pri">Master Tanda Tangan</span>
           <h3 id="ttd-modal-nama" class="font-extrabold text-base mt-2">Nama Pegawai</h3>
         </div>
-        <button onclick="closeModal('ttd-modal')" class="btn btn-ghost btn-icon">✕</button>
+        <button onclick="closeModal('ttd-modal')" class="btn btn-ghost btn-icon" aria-label="Tutup"><i data-ic="x"></i></button>
       </div>
       <div>
         <div class="flex justify-between items-center mb-1.5">
           <span class="text-xs font-bold">Goreskan tanda tangan di area berikut</span>
           <button type="button" onclick="clearCanvas()" class="text-xs font-bold hover:underline" style="color:var(--bad)">Bersihkan</button>
         </div>
-        <canvas id="sig-canvas" width="380" height="150" class="w-full h-36 rounded-2xl touch-none cursor-crosshair" style="background:#fff;border:2px dashed var(--border)"></canvas>
+        <canvas id="sig-canvas" width="380" height="150" class="w-full h-36 rounded-2xl touch-none cursor-crosshair" style="background:#fff;border:2px dashed var(--line)"></canvas>
       </div>
       <div>
-        <label class="lbl">Atau unggah gambar tanda tangan (PNG/JPG)</label>
-        <input type="file" id="upload-ttd-file" accept="image/*" onchange="handleUploadTtd(event)" class="w-full text-xs muted file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-500/10 file:text-indigo-500 cursor-pointer">
+        <label class="btn btn-soft w-full justify-center !py-2.5 cursor-pointer">
+          <i data-ic="upload"></i><span id="upload-ttd-name">Unggah gambar tanda tangan (PNG/JPG)</span>
+          <input type="file" id="upload-ttd-file" accept="image/*" onchange="handleUploadTtd(event)" class="hidden">
+        </label>
       </div>
       <div class="flex gap-2.5 pt-1">
         <button type="button" onclick="closeModal('ttd-modal')" class="btn btn-soft flex-1 justify-center !py-2.5">Batal</button>
@@ -824,7 +971,7 @@
   <!-- ============ MODAL: KONFIRMASI ============ -->
   <div id="confirm-modal" class="modal" style="z-index:80" onclick="if(event.target===this) resolveConfirm(false)">
     <div class="modal-panel max-w-sm p-6 space-y-4 text-center">
-      <div id="cf-icon" class="w-12 h-12 rounded-2xl st-pri mx-auto flex items-center justify-center text-xl">❔</div>
+      <div id="cf-icon" class="w-12 h-12 rounded-2xl st-pri mx-auto flex items-center justify-center"></div>
       <div>
         <h3 id="cf-title" class="font-extrabold text-base">Konfirmasi</h3>
         <p id="cf-msg" class="text-sm muted mt-1.5"></p>
@@ -840,7 +987,7 @@
   <div id="palette-modal" class="modal !items-start !pt-[12vh]" style="z-index:85" onclick="if(event.target===this) closeModal('palette-modal')">
     <div class="modal-panel max-w-xl overflow-hidden !max-h-[70vh] flex flex-col">
       <div class="flex items-center gap-2.5 px-4 py-3.5" style="border-bottom:1px solid var(--border)">
-        <svg class="w-4 h-4 faint" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z"/></svg>
+        <i data-ic="search" class="faint"></i>
         <input id="palette-input" oninput="renderPalette()" onkeydown="paletteKey(event)" placeholder="Cari GTK, halaman, atau aksi…" class="flex-1 bg-transparent outline-none text-sm font-medium" style="color:var(--text)" autocomplete="off">
         <span class="kbd">Esc</span>
       </div>
@@ -863,6 +1010,53 @@
     // =========================================================================
 
     const LOGO_DEFAULT = "https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Coat_of_arms_of_East_Java.svg/240px-Coat_of_arms_of_East_Java.svg.png";
+
+    /* =========================== IKON (SVG, bukan emoji sistem) =========================== */
+    const ICONS = {
+      'search': '<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',
+      'moon': '<path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/>',
+      'sun': '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+      'calendar': '<rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+      'sheet': '<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8M10 9H8"/>',
+      'image': '<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>',
+      'printer': '<path d="M6 9V3h12v6M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="7" rx="1"/>',
+      'alert': '<path d="M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0zM12 9v4M12 17h.01"/>',
+      'users': '<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.9M16 3.1a4 4 0 010 7.8"/>',
+      'check-circle': '<path d="M22 11.1V12a10 10 0 11-5.9-9.1"/><path d="M22 4L12 14l-3-3"/>',
+      'pen': '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/>',
+      'umbrella': '<path d="M23 12a11.05 11.05 0 00-22 0zm-5 7a3 3 0 01-6 0v-7"/>',
+      'trash': '<path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6M10 11v6M14 11v6"/>',
+      'x': '<path d="M18 6L6 18M6 6l12 12"/>',
+      'chev-l': '<path d="M15 18l-6-6 6-6"/>',
+      'chev-r': '<path d="M9 18l6-6-6-6"/>',
+      'chev-d': '<path d="M6 9l6 6 6-6"/>',
+      'grid': '<rect x="3" y="3" width="7" height="9" rx="2"/><rect x="14" y="3" width="7" height="5" rx="2"/><rect x="14" y="12" width="7" height="9" rx="2"/><rect x="3" y="16" width="7" height="5" rx="2"/>',
+      'archive': '<rect x="2" y="3" width="20" height="5" rx="1"/><path d="M4 8v11a2 2 0 002 2h12a2 2 0 002-2V8M10 12h4"/>',
+      'refresh': '<path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.5 9a9 9 0 0114.9-3.4L23 10M1 14l4.6 4.4A9 9 0 0020.5 15"/>',
+      'trend': '<path d="M23 6l-9.5 9.5-5-5L1 18"/><path d="M17 6h6v6"/>',
+      'inbox': '<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5.1L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.5-6.9A2 2 0 0016.8 4H7.2a2 2 0 00-1.7 1.1z"/>',
+      'sparkle': '<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>',
+      'help': '<circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 015.8 1c0 2-3 3-3 3M12 17h.01"/>',
+      'plus': '<path d="M12 5v14M5 12h14"/>',
+      'minus': '<path d="M5 12h14"/>',
+      'check': '<path d="M20 6L9 17l-5-5"/>',
+      'info': '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>',
+      'user': '<path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+      'lock': '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>',
+      'eye': '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/>',
+      'upload': '<path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>',
+      'clipboard': '<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/>',
+      'activity': '<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>',
+      'slash': '<circle cx="12" cy="12" r="10"/><path d="M4.9 4.9l14.2 14.2"/>'
+    };
+    const ic = (n, c = 'w-4 h-4') => `<svg class="${c}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n] || ''}</svg>`;
+    function hydrateIcons(root) {
+      (root || document).querySelectorAll('[data-ic]').forEach(el => {
+        if (el._h) return;
+        el.innerHTML = ic(el.dataset.ic, el.dataset.cls || 'w-4 h-4');
+        el.classList.add('ico'); el._h = 1;
+      });
+    }
 
     const MASTER_JABATAN_BY_NO = {
       1: "KEPALA SEKOLAH", 2: "GURU TEKNIK KOMPUTER DAN JARINGAN", 3: "GURU IPAS", 4: "GURU MATEMATIKA", 5: "GURU IPAS",
@@ -902,6 +1096,10 @@
       arsip: ['Arsip Bulanan', 'Riwayat presensi bulan-bulan sebelumnya']
     };
 
+    const MONTHS_ID = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    const DAYS_ID = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const KPOP_COLORS = ['#ff4fa8', '#a78bfa', '#22d3ee', '#fde047', '#ff7bbd'];
+
     let sessionToken = sessionStorage.getItem('smk_upacara_token') || "";
     let wbData = null;
     let currentPage = 'dashboard';
@@ -916,20 +1114,35 @@
     let confirmResolver = null;
     let paletteItems = [], paletteIdx = 0;
     let selected = new Set(), lastFiltered = [];
+    let arsipPage = 1;
 
     const $ = (id) => document.getElementById(id);
     const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const pad = (n) => String(n).padStart(2, '0');
 
     /* =========================== INIT =========================== */
     window.onload = () => {
+      hydrateIcons();
       buildStaticSlots();
+      buildTicker();
+      buildSparkles();
       const savedLogo = localStorage.getItem('smk_logo_jatim');
       if (savedLogo) setLogo(savedLogo);
       initSignaturePad();
       syncThemeIcon();
       setInterval(updateSyncLabel, 30000);
       enhanceSelects();
+      renderDP();
       document.addEventListener('keydown', onGlobalKey);
+      // Efek riak + percikan bintang pada tombol
+      document.addEventListener('pointerdown', (e) => {
+        const t = e.target.closest('.btn,.seg-btn,.pill,.act-tile,.pg'); if (!t || t.disabled) return;
+        const r = t.getBoundingClientRect(), s = Math.max(r.width, r.height) * 2;
+        const d = document.createElement('span'); d.className = 'rip';
+        d.style.cssText = `width:${s}px;height:${s}px;left:${e.clientX - r.left - s / 2}px;top:${e.clientY - r.top - s / 2}px`;
+        t.appendChild(d); setTimeout(() => d.remove(), 700);
+        burst(e.clientX, e.clientY);
+      });
       $('kelola-tbody').addEventListener('click', onKelolaClick);
       $('kelola-tbody').addEventListener('change', (e) => {
         const cb = e.target.closest('[data-sel]'); if (!cb) return;
@@ -945,6 +1158,31 @@
         loadWorkbook();
       }
     };
+
+    function burst(x, y) {
+      for (let i = 0; i < 7; i++) {
+        const p = document.createElement('span'); p.className = 'burst';
+        const a = (Math.PI * 2 * i) / 7 + Math.random() * .6, dist = 26 + Math.random() * 30;
+        p.style.cssText = `left:${x - 5}px;top:${y - 5}px;--c:${KPOP_COLORS[i % KPOP_COLORS.length]};--dx:${Math.cos(a) * dist}px;--dy:${Math.sin(a) * dist}px`;
+        document.body.appendChild(p); setTimeout(() => p.remove(), 800);
+      }
+    }
+
+    function buildTicker() {
+      const items = ['DISIPLIN', 'KOMPAK', 'BERPRESTASI', 'SMK NEGERI TAMBAKBOYO', 'UPACARA GTK', 'SIAP TAMPIL'];
+      const one = items.map(t => `<span class="tk">${ic('sparkle', 'w-3.5 h-3.5')}${t}</span>`).join('');
+      $('ticker-track').innerHTML = one + one;
+    }
+
+    function buildSparkles() {
+      const st = $('stage'); if (!st) return;
+      for (let i = 0; i < 22; i++) {
+        const s = document.createElement('span'); s.className = 'spk';
+        const sz = 6 + Math.random() * 12;
+        s.style.cssText = `left:${Math.random() * 100}%;top:${Math.random() * 100}%;width:${sz}px;height:${sz}px;--c:${KPOP_COLORS[i % KPOP_COLORS.length]};--d:${3 + Math.random() * 4}s;--dl:${-Math.random() * 6}s`;
+        st.appendChild(s);
+      }
+    }
 
     function buildStaticSlots() {
       const kop = `
@@ -976,8 +1214,6 @@
     function setLogo(src) { document.querySelectorAll('.kop-logo').forEach(i => i.src = src); }
 
     /* =========================== DROPDOWN KUSTOM =========================== */
-    // Mengganti <select> bawaan browser dengan popover (desktop) / bottom sheet (mobile).
-    // <select> asli tetap ada (tersembunyi) sehingga .value, onchange, dan opsi dinamis tetap bekerja.
     const CS = { cur: null, items: [], hi: 0, w: 0 };
     const CS_CHEV = '<svg class="cs-chev" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>';
     const CS_CHECK = '<svg class="ck" fill="none" stroke="currentColor" stroke-width="2.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>';
@@ -1097,6 +1333,43 @@
       if (k === 'Enter') { e.preventDefault(); e.stopPropagation(); pickCS(CS.hi); }
     }
 
+    /* =========================== KALENDER KUSTOM =========================== */
+    const DP = { y: new Date().getFullYear(), m: new Date().getMonth(), sel: '' };
+    function setDP(iso) {
+      $('inp-special-date').value = iso || ''; DP.sel = iso || '';
+      if (iso) { const p = iso.split('-').map(Number); DP.y = p[0]; DP.m = p[1] - 1; }
+      dpLabel(); renderDP();
+    }
+    function dpLabel() {
+      const l = $('dp-label');
+      if (!DP.sel) { l.textContent = 'Pilih tanggal'; l.classList.add('faint'); return; }
+      const [y, m, d] = DP.sel.split('-').map(Number);
+      const dt = new Date(y, m - 1, d);
+      l.textContent = `${DAYS_ID[dt.getDay()]}, ${d} ${MONTHS_ID[m - 1]} ${y}`; l.classList.remove('faint');
+    }
+    function toggleDP(force) {
+      const p = $('dp-pop'); const open = force !== undefined ? force : !p.classList.contains('open');
+      p.classList.toggle('open', open); $('dp-chev').style.transform = open ? 'rotate(180deg)' : '';
+    }
+    function dpNav(d) { DP.m += d; if (DP.m < 0) { DP.m = 11; DP.y--; } if (DP.m > 11) { DP.m = 0; DP.y++; } renderDP(); }
+    function dpPick(iso) { setDP(iso); toggleDP(false); }
+    function renderDP() {
+      const startOffset = (new Date(DP.y, DP.m, 1).getDay() + 6) % 7;
+      const dim = new Date(DP.y, DP.m + 1, 0).getDate(), prevDim = new Date(DP.y, DP.m, 0).getDate();
+      const taken = new Set((wbData ? wbData.tanggalList : []).map(t => t.iso));
+      const today = wbData ? todayIso() : '';
+      let html = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'].map(d => `<div class="dp-dow">${d}</div>`).join('');
+      for (let i = 0; i < 42; i++) {
+        let d = i - startOffset + 1, y = DP.y, m = DP.m, out = false;
+        if (d < 1) { d += prevDim; m--; out = true; if (m < 0) { m = 11; y--; } }
+        else if (d > dim) { d -= dim; m++; out = true; if (m > 11) { m = 0; y++; } }
+        const iso = `${y}-${pad(m + 1)}-${pad(d)}`;
+        html += `<button type="button" class="dp-day ${out ? 'out' : ''} ${iso === today ? 'today' : ''} ${iso === DP.sel ? 'sel' : ''} ${taken.has(iso) ? 'has' : ''}" onclick="dpPick('${iso}')">${d}</button>`;
+      }
+      $('dp-title').textContent = `${MONTHS_ID[DP.m]} ${DP.y}`;
+      $('dp-grid').innerHTML = html;
+    }
+
     /* =========================== TEMA =========================== */
     function toggleTheme() {
       const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
@@ -1107,9 +1380,10 @@
     }
     function syncThemeIcon() {
       const dark = document.documentElement.getAttribute('data-theme') === 'dark';
-      const ic = $('theme-ic'); if (ic) ic.textContent = dark ? '☀️' : '🌙';
-      document.querySelectorAll('.theme-ic-m').forEach(e => e.textContent = dark ? '☀️' : '🌙');
-      const m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = dark ? '#0a0f1e' : '#4f46e5';
+      const svg = ic(dark ? 'sun' : 'moon');
+      const a = $('theme-ic'); if (a) a.innerHTML = svg;
+      document.querySelectorAll('.theme-ic-m').forEach(e => e.innerHTML = svg);
+      const m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = dark ? '#0c0516' : '#ff2d95';
     }
     const cssVar = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 
@@ -1119,7 +1393,7 @@
       const bar = $('top-progress');
       if (busy > 0) { bar.classList.add('on'); bar.style.width = '72%'; }
       else { bar.style.width = '100%'; setTimeout(() => { if (busy === 0) { bar.classList.remove('on'); bar.style.width = '0'; } }, 320); }
-      const ic = $('sync-ic'); if (ic) ic.style.animation = busy > 0 ? 'spin 1s linear infinite' : '';
+      const i = $('sync-ic'); if (i) i.style.animation = busy > 0 ? 'spin 1s linear infinite' : '';
     }
     (function () { const s = document.createElement('style'); s.textContent = '@keyframes spin{to{transform:rotate(360deg)}}'; document.head.appendChild(s); })();
 
@@ -1128,7 +1402,7 @@
       const box = $('toast-box');
       const el = document.createElement('div');
       el.className = 'toast toast-' + type;
-      el.innerHTML = `<span class="ic">${type === 'success' ? '✓' : type === 'error' ? '!' : 'i'}</span><span class="flex-1">${esc(msg)}</span>`;
+      el.innerHTML = `<span class="ic">${ic(type === 'success' ? 'check' : type === 'error' ? 'x' : 'info', 'w-3 h-3')}</span><span class="flex-1">${esc(msg)}</span>`;
       if (action) {
         const b = document.createElement('button'); b.className = 'act'; b.textContent = action.label;
         b.onclick = () => { action.fn(); dismiss(); };
@@ -1147,9 +1421,9 @@
     function closeModal(id) { $(id).classList.remove('open'); }
     function anyModalOpen() { return !!document.querySelector('.modal.open'); }
 
-    function confirmDialog({ title, message, okText = 'Ya, lanjutkan', danger = false, icon = '❔' }) {
+    function confirmDialog({ title, message, okText = 'Ya, lanjutkan', danger = false, icon = 'help' }) {
       $('cf-title').textContent = title; $('cf-msg').textContent = message;
-      $('cf-icon').textContent = icon; $('cf-icon').className = 'w-12 h-12 rounded-2xl mx-auto flex items-center justify-center text-xl ' + (danger ? 'st-bad' : 'st-pri');
+      $('cf-icon').innerHTML = ic(icon, 'w-6 h-6'); $('cf-icon').className = 'w-12 h-12 rounded-2xl mx-auto flex items-center justify-center ' + (danger ? 'st-bad' : 'st-pri');
       const ok = $('cf-ok'); ok.textContent = okText; ok.className = 'btn flex-1 justify-center !py-2.5 ' + (danger ? 'btn-bad' : 'btn-primary');
       openModal('confirm-modal');
       return new Promise(res => { confirmResolver = res; });
@@ -1174,7 +1448,7 @@
       if (!lastSync) { l.textContent = 'Belum sinkron'; return; }
       const m = Math.floor((Date.now() - lastSync) / 60000);
       l.textContent = m < 1 ? 'Tersinkron baru saja' : `Tersinkron ${m} menit lalu`;
-      d.style.background = m < 5 ? '#10b981' : '#f59e0b';
+      d.style.background = m < 5 ? '#10d9a0' : '#f59e0b';
     }
 
     /* =========================== AUTH =========================== */
@@ -1282,6 +1556,8 @@
       if (!silent) window.scrollTo({ top: 0, behavior: 'smooth' });
       if (wbData) {
         if (page === 'laporan') renderLaporan();
+        if (page === 'kelola') renderKelolaList(true);
+        if (page === 'arsip') renderArsip();
         if (page === 'dashboard' && trenChart) { trenChart.resize(); kepegChart && kepegChart.resize(); }
       }
     }
@@ -1344,7 +1620,7 @@
       $('sidebar-periode').textContent = p; $('mobile-periode').textContent = p;
       $('sel-bulan').value = wbData.bulan; $('inp-tahun').value = wbData.tahun;
       updateSyncLabel();
-      renderDashboard(); initKelolaFilters(); renderKelolaList(); renderLaporan(); initArsipFilter(); renderArsip();
+      renderDashboard(); initKelolaFilters(); renderKelolaList(true); renderLaporan(); initArsipFilter(); renderArsip(); renderDP();
     }
 
     function showDashboardSkeleton() {
@@ -1389,9 +1665,9 @@
         const c = countOfDate(t.colIndex);
         const fillPct = totalGtk ? Math.round((totalGtk - c.belum) / totalGtk * 100) : 0;
         const isToday = t.iso === todayIso();
-        const rm = t.isKhusus ? `<button data-del="${t.colIndex}" data-label="${esc(t.label)}" title="Hapus jadwal khusus" class="btn btn-ghost !p-1 !text-[11px] hover:!text-rose-500">✕</button>` : '';
+        const rm = t.isKhusus ? `<button data-del="${t.colIndex}" data-label="${esc(t.label)}" aria-label="Hapus jadwal khusus" class="btn btn-ghost !p-1 hover:!text-rose-500">${ic('x', 'w-3.5 h-3.5')}</button>` : '';
         return `
-          <div class="card card-hover p-4 flex flex-col justify-between gap-3 ${t.isKhusus ? '' : ''}" style="${t.isKhusus ? 'border-color:color-mix(in srgb,var(--warn) 40%,transparent)' : ''}">
+          <div class="card card-hover p-4 flex flex-col justify-between gap-3" style="${t.isKhusus ? 'border-color:color-mix(in srgb,var(--warn) 40%,transparent)' : ''}">
             <div>
               <div class="flex items-center justify-between gap-1">
                 <div class="flex items-center gap-1.5">
@@ -1403,7 +1679,7 @@
               <p class="text-[11px] muted line-clamp-1 mt-0.5">${esc(t.judulUpacara)}</p>
             </div>
             <div>
-              <div class="bar-track !h-1.5"><div class="bar-fill" style="width:${fillPct}%;background:var(--ok)"></div></div>
+              <div class="bar-track !h-1.5"><div class="bar-fill" style="width:${fillPct}%;background-color:var(--ok)"></div></div>
               <div class="flex items-center justify-between text-[11px] mt-2">
                 <span class="muted">Hadir <strong style="color:var(--ok)">${c.h}/${totalGtk}</strong></span>
                 <button onclick="bukaKelolaTanggal(${t.colIndex})" class="font-bold hover:underline" style="color:var(--primary)">Absen →</button>
@@ -1449,24 +1725,24 @@
       trenChart = new Chart($('chart-tren'), {
         type: 'bar',
         data: { labels, datasets: [
-          { label: 'Hadir (TTD)', data: dH, backgroundColor: '#10b981', borderRadius: 8, barPercentage: 0.6 },
-          { label: 'Tidak Hadir', data: dA, backgroundColor: '#f43f5e', borderRadius: 8, barPercentage: 0.6 }
+          { label: 'Hadir (TTD)', data: dH, backgroundColor: '#22d3ee', borderRadius: 8, barPercentage: 0.6 },
+          { label: 'Tidak Hadir', data: dA, backgroundColor: '#ff4fa8', borderRadius: 8, barPercentage: 0.6 }
         ] },
         options: {
           responsive: true, maintainAspectRatio: false,
-          animation: { duration: 900, easing: 'easeOutQuart' },
+          animation: { duration: 1100, easing: 'easeOutQuart' },
           plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, color: tick, font: { size: 11 } } }, tooltip: { padding: 10, cornerRadius: 10 } },
           scales: { y: { beginAtZero: true, grid: { color: grid }, border: { display: false }, ticks: { color: tick, font: { size: 11 }, precision: 0 } }, x: { grid: { display: false }, ticks: { color: tick, font: { size: 11 } } } }
         }
       });
 
       const kl = Object.keys(kepegMap), kv = Object.values(kepegMap);
-      const palette = ['#6366f1', '#0ea5e9', '#10b981', '#f59e0b', '#64748b'];
+      const palette = ['#ff4fa8', '#a78bfa', '#22d3ee', '#fde047', '#34e8b4'];
       if (kepegChart) kepegChart.destroy();
       kepegChart = new Chart($('chart-kepeg'), {
         type: 'doughnut',
         data: { labels: kl, datasets: [{ data: kv, backgroundColor: palette, borderWidth: 3, borderColor: cssVar('--surface'), hoverOffset: 6 }] },
-        options: { responsive: true, maintainAspectRatio: false, cutout: '72%', animation: { duration: 900 }, plugins: { legend: { display: false } } }
+        options: { responsive: true, maintainAspectRatio: false, cutout: '72%', animation: { duration: 1100 }, plugins: { legend: { display: false } } }
       });
       $('kepeg-legend').innerHTML = kl.map((l, i) => `
         <div class="flex items-center justify-between px-2.5 py-1.5 rounded-lg" style="background:var(--surface2)">
@@ -1483,7 +1759,7 @@
           <span class="avatar" style="--h:${hue(r.g.nama)}">${esc(initials(r.g.nama))}</span>
           <span class="min-w-0 flex-1"><span class="block text-[13px] font-bold truncate">${esc(r.g.nama)}</span><span class="block text-[10.5px] muted truncate">${esc(getJabatanGuru(r.g))}</span></span>
           <span class="flex gap-1">${r.a ? `<span class="chip st-bad">A ${r.a}</span>` : ''}${r.s ? `<span class="chip st-warn">S ${r.s}</span>` : ''}${r.i ? `<span class="chip st-info">I ${r.i}</span>` : ''}</span>
-        </button>`).join('') : '<p class="text-xs muted text-center py-8">🎉 Belum ada ketidakhadiran tercatat.</p>';
+        </button>`).join('') : `<div class="text-xs muted text-center py-8 flex flex-col items-center gap-2"><span class="st-ok w-10 h-10 rounded-2xl grid place-items-center">${ic('sparkle', 'w-5 h-5')}</span>Belum ada ketidakhadiran tercatat.</div>`;
 
       const noTtd = list.filter(g => !g.ttdUrl);
       $('badge-no-ttd').textContent = noTtd.length + ' GTK';
@@ -1491,9 +1767,9 @@
         <div class="flex items-center gap-3 p-2.5 rounded-xl">
           <span class="avatar" style="--h:${hue(g.nama)}">${esc(initials(g.nama))}</span>
           <span class="min-w-0 flex-1"><span class="block text-[13px] font-bold truncate">${esc(g.nama)}</span><span class="block text-[10.5px] muted truncate">${esc(getJabatanGuru(g))}</span></span>
-          <button onclick="openTtdModal(${g.no})" class="btn btn-soft !py-1.5">✍️ Atur</button>
+          <button onclick="openTtdModal(${g.no})" class="btn btn-soft !py-1.5">${ic('pen', 'w-3.5 h-3.5')} Atur</button>
         </div>`).join('') + (noTtd.length > 6 ? `<p class="text-[11px] faint text-center pt-1">+${noTtd.length - 6} GTK lainnya</p>` : '')
-        : '<p class="text-xs muted text-center py-8">✅ Semua GTK sudah punya tanda tangan asli.</p>';
+        : `<div class="text-xs muted text-center py-8 flex flex-col items-center gap-2"><span class="st-ok w-10 h-10 rounded-2xl grid place-items-center">${ic('check-circle', 'w-5 h-5')}</span>Semua GTK sudah punya tanda tangan asli.</div>`;
     }
 
     function bukaKelolaTanggal(colIndex) { switchPage('kelola'); syncTanggalSelectors(colIndex); }
@@ -1519,7 +1795,7 @@
     function syncTanggalSelectors(v) {
       $('select-tanggal').value = v; $('select-tanggal-laporan').value = v;
       selected.clear();
-      renderKelolaList(); renderLaporan();
+      renderKelolaList(true); renderLaporan();
     }
     function shiftTanggal(d) {
       if (!wbData) return;
@@ -1531,7 +1807,7 @@
     function setStatusFilter(f) {
       statusFilter = f;
       document.querySelectorAll('#status-pills .pill').forEach(p => p.classList.toggle('active', p.dataset.f === f));
-      renderKelolaList();
+      renderKelolaList(true);
     }
 
     function statusChip(cur) {
@@ -1539,7 +1815,7 @@
       const s = STATUS[cur]; return `<span class="chip ${s.cls}">${cur === 'TANPA KETERANGAN' ? 'TANPA KET.' : s.label.toUpperCase()}</span>`;
     }
 
-    function renderKelolaList() {
+    function renderKelolaList(anim) {
       if (!wbData) return;
       const col = activeCol();
       const kw = $('search-gtk').value.toLowerCase().trim();
@@ -1550,7 +1826,7 @@
 
       const tot = wbData.guruList.length || 1;
       const seg = [[c.h, 'var(--ok)'], [c.s + c.i, 'var(--info)'], [c.a, 'var(--bad)'], [c.l, 'var(--mute)']];
-      $('stack-bar').innerHTML = seg.map(([n, col]) => `<div style="width:${n / tot * 100}%;background:${col};transition:width .6s cubic-bezier(.22,1,.36,1)"></div>`).join('');
+      $('stack-bar').innerHTML = seg.map(([n, clr]) => `<div style="width:${n / tot * 100}%;background:${clr};transition:width .6s cubic-bezier(.22,1,.36,1)"></div>`).join('');
       $('fill-text').textContent = Math.round((tot - c.belum) / tot * 100) + '% terisi';
 
       const filtered = wbData.guruList.filter(g => {
@@ -1566,14 +1842,14 @@
 
       const tbody = $('kelola-tbody');
       if (!filtered.length) {
-        tbody.innerHTML = '<tr><td colspan="5" class="py-16 text-center text-sm muted">🔍 Tidak ada GTK yang cocok dengan filter.</td></tr>';
+        tbody.innerHTML = `<tr><td colspan="5" class="py-16 text-center text-sm muted"><div class="flex flex-col items-center gap-2"><span class="st-mute w-12 h-12 rounded-2xl grid place-items-center">${ic('search', 'w-6 h-6')}</span>Tidak ada GTK yang cocok dengan filter.</div></td></tr>`;
         lastFiltered = filtered; updateBulkBar();
         return;
       }
       const opsi = ['HADIR', 'SAKIT', 'IZIN', 'TANPA KETERANGAN', 'LIBUR UPACARA'];
       lastFiltered = filtered;
 
-      tbody.innerHTML = filtered.map(g => {
+      tbody.innerHTML = filtered.map((g, idx) => {
         const cur = g.absensi[col] || '';
         const paraf = cur === 'HADIR'
           ? `<div class="inline-flex flex-col items-center justify-center px-3 py-1 rounded-xl st-ok min-w-[140px]"><div style="color:var(--text)">${renderSignatureVisual(g, 'h-8')}</div><span class="text-[9px] font-extrabold uppercase tracking-wider mt-0.5">Hadir</span></div>`
@@ -1582,8 +1858,9 @@
           const s = STATUS[v];
           return `<button data-act="status" data-row="${g.rowIndex}" data-col="${col}" data-val="${v}" class="seg-btn ${cur === v ? s.on : ''}">${s.label}</button>`;
         }).join('');
+        const rowStyle = (anim ? `--i:${Math.min(idx, 14)};` : '') + (selected.has(g.rowIndex) ? 'background:color-mix(in srgb, var(--primary) 8%, transparent)' : '');
         return `
-          <tr class="row" data-row="${g.rowIndex}" ${selected.has(g.rowIndex) ? 'style="background:color-mix(in srgb, var(--primary) 8%, transparent)"' : ''}>
+          <tr class="row ${anim ? 'row-in' : ''}" data-row="${g.rowIndex}" style="${rowStyle}">
             <td class="py-3.5 pl-4 pr-1 text-center"><input type="checkbox" class="cb" data-sel="${g.rowIndex}" ${selected.has(g.rowIndex) ? 'checked' : ''} aria-label="Pilih ${esc(g.nama)}"></td>
             <td class="py-3.5 px-4 text-center font-mono text-xs font-semibold faint hidden md:table-cell">${g.no}</td>
             <td class="py-3.5 px-4">
@@ -1595,7 +1872,7 @@
                   <div class="flex flex-wrap items-center gap-2 mt-1.5">
                     <span class="chip st-mute !py-0.5 !text-[10px]">${esc(g.statusKepeg)} • ${esc(g.jk)}</span><span class="chip st-pri !py-0.5 !text-[10px] md:hidden">No. ${g.no}</span>
                     <span class="md:hidden">${statusChip(cur)}</span>
-                    <button data-act="ttd" data-no="${g.no}" class="text-[11px] font-bold hover:underline" style="color:var(--primary)">✍️ ${g.ttdUrl ? 'Ubah TTD' : 'Atur TTD'}</button>
+                    <button data-act="ttd" data-no="${g.no}" class="inline-flex items-center gap-1 text-[11px] font-bold hover:underline" style="color:var(--primary)">${ic('pen', 'w-3 h-3')} ${g.ttdUrl ? 'Ubah TTD' : 'Atur TTD'}</button>
                   </div>
                 </div>
               </div>
@@ -1674,7 +1951,7 @@
       const ok = await confirmDialog({
         title: `Tandai ${targets.length} GTK sebagai Hadir?`,
         message: `GTK terpilih pada ${lbl} akan ditandai Hadir dan tanda tangannya tercatat.`,
-        okText: 'Tandai Hadir', icon: '✅'
+        okText: 'Tandai Hadir', icon: 'check-circle'
       });
       if (!ok) return;
 
@@ -1705,7 +1982,7 @@
       const ok = await confirmDialog({
         title: `Tandai ${onlyEmpty ? 'sisa GTK' : 'semua GTK'} sebagai ${nama}?`,
         message: `${onlyEmpty ? 'Hanya GTK yang belum diisi' : 'Seluruh GTK'} pada ${lbl} akan diubah.`,
-        okText: 'Terapkan', danger: statusValue === 'TANPA KETERANGAN', icon: statusValue === 'HADIR' ? '✅' : statusValue === 'TANPA KETERANGAN' ? '⚠️' : '📋'
+        okText: 'Terapkan', danger: statusValue === 'TANPA KETERANGAN', icon: statusValue === 'TANPA KETERANGAN' ? 'alert' : 'clipboard'
       });
       if (!ok) return;
       try {
@@ -1714,19 +1991,6 @@
         await loadWorkbook();
         toastOk(`${res.count} data berhasil diperbarui.`);
       } catch (err) { toastErr("Gagal: " + err.message); }
-    }
-
-    function copyRekapWA() {
-      const col = activeCol();
-      const t = wbData.tanggalList.find(x => x.colIndex === col);
-      const tglText = t ? `${t.hari}, ${t.label} (${t.judulUpacara})` : '-';
-      const list = wbData.guruList;
-      const by = (v) => list.filter(g => g.absensi[col] === v);
-      const fmt = (a) => a.length ? a.map((g, i) => `${i + 1}. ${g.nama}`).join('\n') : '-';
-      const h = by('HADIR'), s = by('SAKIT'), iz = by('IZIN'), a = by('TANPA KETERANGAN');
-      const pct = list.length ? Math.round(h.length / list.length * 100) : 0;
-      const teks = `*LAPORAN ABSENSI UPACARA GTK*\n*SMK NEGERI TAMBAKBOYO*\n${tglText}\n\n• Total GTK: ${list.length}\n• Hadir: ${h.length} (${pct}%)\n• Sakit: ${s.length}\n• Izin: ${iz.length}\n• Tanpa Keterangan: ${a.length}\n\n*Sakit:*\n${fmt(s)}\n\n*Izin:*\n${fmt(iz)}\n\n*Tanpa Keterangan:*\n${fmt(a)}`;
-      navigator.clipboard.writeText(teks).then(() => toastOk("Laporan WhatsApp disalin ke clipboard."), () => toastErr("Gagal menyalin. Izinkan akses clipboard."));
     }
 
     /* =========================== DETAIL GTK =========================== */
@@ -1745,7 +2009,7 @@
             <div class="min-w-0"><h3 class="font-extrabold text-base leading-tight">${esc(g.nama)}</h3><p class="text-[11px] muted mt-0.5">${esc(getJabatanGuru(g))}</p>
               <div class="flex gap-1.5 mt-1.5"><span class="chip st-mute !py-0.5">${esc(g.statusKepeg)} • ${esc(g.jk)}</span><span class="chip st-pri !py-0.5">No. ${g.no}</span></div></div>
           </div>
-          <button onclick="closeModal('detail-drawer')" class="btn btn-ghost btn-icon">✕</button>
+          <button onclick="closeModal('detail-drawer')" class="btn btn-ghost btn-icon" aria-label="Tutup">${ic('x')}</button>
         </div>
         <div class="grid grid-cols-4 gap-2 text-center">
           <div class="rounded-2xl p-3 st-ok"><p class="text-xl font-extrabold">${s.h}</p><p class="text-[10px] font-bold uppercase">Hadir</p></div>
@@ -1755,12 +2019,12 @@
         </div>
         <div>
           <div class="flex justify-between text-xs font-bold mb-1.5"><span class="muted">Tingkat kehadiran periode ini</span><span>${s.pct}%</span></div>
-          <div class="bar-track"><div class="bar-fill" style="width:${s.pct}%;background:linear-gradient(90deg,#6366f1,#10b981)"></div></div>
+          <div class="bar-track"><div class="bar-fill" style="width:${s.pct}%;background-color:var(--ok)"></div></div>
         </div>
-        <div class="rounded-2xl p-4 text-center" style="background:#fff;border:1px dashed var(--border);color:#000">
+        <div class="rounded-2xl p-4 text-center" style="background:#fff;border:1px dashed var(--line);color:#000">
           <p class="text-[10px] font-extrabold uppercase tracking-wider mb-1" style="color:#64748b">Tanda tangan</p>${renderSignatureVisual(g, 'h-14')}
         </div>
-        <button onclick="openTtdModal(${g.no})" class="btn btn-soft w-full justify-center !py-2.5">✍️ ${g.ttdUrl ? 'Ubah' : 'Atur'} Tanda Tangan Asli</button>
+        <button onclick="openTtdModal(${g.no})" class="btn btn-soft w-full justify-center !py-2.5">${ic('pen')} ${g.ttdUrl ? 'Ubah' : 'Atur'} Tanda Tangan Asli</button>
         <div><p class="text-xs font-extrabold mb-1">Riwayat periode ${esc(wbData.bulan)} ${esc(wbData.tahun)}</p>${rows || '<p class="text-xs muted py-4">Belum ada jadwal.</p>'}</div>`;
       openModal('detail-drawer');
     }
@@ -1780,19 +2044,15 @@
     function renderLaporan() { if (!wbData) return; if (lapMode === 'harian') renderDaftarHadirLaporan(); else renderRekapBulanan(); }
 
     // ======================= UKURAN TANDA TANGAN DI LAPORAN =======================
-    // Ubah angka di bawah ini jika ingin lebih besar / lebih kecil:
-    const TTD_IMG_TINGGI = '6.5rem';   // tinggi gambar TTD asli (sebelumnya 3.4rem)
-    const TTD_FONT_PENDEK = 42;        // ukuran font TTD otomatis, nama <= 12 huruf
+    const TTD_IMG_TINGGI = '6.5rem';   // tinggi gambar TTD asli
+    const TTD_FONT_PENDEK = 42;        // font TTD otomatis, nama <= 12 huruf
     const TTD_FONT_SEDANG = 34;        // nama 13-18 huruf
     const TTD_FONT_PANJANG = 27;       // nama > 18 huruf
 
-    // TTD dibuat "melayang" di tengah kolom (position:absolute) sehingga boleh melewati
-    // garis kolom tanpa membuat baris tabel membesar. Variasi miring/posisi tetap per GTK
-    // (berdasarkan nomor) agar terlihat seperti tanda tangan tangan masing-masing orang.
     function renderSignatureLaporan(g) {
-      const rot = ((g.no * 37) % 9) - 4;      // -4° s/d +4°
-      const dy = ((g.no * 53) % 7) - 3;       // -3px s/d +3px
-      const dx = ((g.no * 29) % 9) - 4;       // -4px s/d +4px
+      const rot = ((g.no * 37) % 9) - 4;
+      const dy = ((g.no * 53) % 7) - 3;
+      const dx = ((g.no * 29) % 9) - 4;
       const tf = `transform:translate(${dx}px,${dy}px) rotate(${rot}deg);`;
       if (g.ttdUrl) {
         return `<img src="${esc(g.ttdUrl)}" alt="TTD ${esc(g.nama)}" style="height:${TTD_IMG_TINGGI};width:auto;max-width:none;object-fit:contain;display:block;${tf}">`;
@@ -1854,71 +2114,196 @@
       }).join('');
     }
 
-    /* =========================== EKSPOR CSV =========================== */
-    function exportCSV() {
+    /* =========================== EKSPOR EXCEL (.xlsx) =========================== */
+    async function exportExcel() {
       if (!wbData) return;
-      const tg = wbData.tanggalList;
-      const q = (v) => `"${String(v == null ? '' : v).replace(/"/g, '""')}"`;
-      const head = ['No', 'Nama', 'Jabatan', 'Kepegawaian', 'JK', ...tg.map(t => `${t.hari} ${t.label}`), 'Hadir', 'Sakit', 'Izin', 'Alpa', 'Persen Hadir'];
-      const lines = [head.map(q).join(';')];
-      wbData.guruList.forEach(g => {
-        const s = statOf(g);
-        lines.push([g.no, g.nama, getJabatanGuru(g), g.statusKepeg, g.jk, ...tg.map(t => g.absensi[t.colIndex] || ''), s.h, s.s, s.i, s.a, s.pct + '%'].map(q).join(';'));
-      });
-      const blob = new Blob(['\ufeff' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `Rekap-Upacara-GTK-${wbData.bulan}-${wbData.tahun}.csv`;
-      document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(() => URL.revokeObjectURL(a.href), 1500);
-      toastOk("Rekap CSV diunduh (bisa dibuka di Excel).");
+      if (!window.ExcelJS) { toastErr('Pustaka Excel belum termuat. Periksa koneksi internet lalu muat ulang halaman.'); return; }
+      try {
+        showToast('Menyusun file Excel…');
+        const tg = wbData.tanggalList, list = wbData.guruList;
+        const wb = new ExcelJS.Workbook();
+        wb.creator = 'SIM Upacara GTK - SMK Negeri Tambakboyo'; wb.created = new Date();
+
+        const fillOf = { 'HADIR': 'FFD1FAE5', 'SAKIT': 'FFFEF3C7', 'IZIN': 'FFE0F2FE', 'TANPA KETERANGAN': 'FFFFE4E6', 'LIBUR UPACARA': 'FFE2E8F0' };
+        const fontOf = { 'HADIR': 'FF047857', 'SAKIT': 'FFB45309', 'IZIN': 'FF0369A1', 'TANPA KETERANGAN': 'FFBE123C', 'LIBUR UPACARA': 'FF475569' };
+        const thin = { style: 'thin', color: { argb: 'FFE9B8D6' } };
+        const border = { top: thin, left: thin, bottom: thin, right: thin };
+        const headFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE11D80' } };
+
+        /* ----- Sheet 1: Rekap per GTK ----- */
+        const nCols = 5 + tg.length + 6;
+        const ws = wb.addWorksheet('Rekap Kehadiran', {
+          views: [{ state: 'frozen', xSplit: 2, ySplit: 4 }],
+          pageSetup: { orientation: 'landscape', paperSize: 9, fitToPage: true, fitToWidth: 1, fitToHeight: 0 }
+        });
+        ws.mergeCells(1, 1, 1, nCols); ws.mergeCells(2, 1, 2, nCols);
+        const c1 = ws.getCell(1, 1); c1.value = 'REKAPITULASI KEHADIRAN GTK UPACARA BENDERA';
+        c1.font = { bold: true, size: 15, color: { argb: 'FF701A75' } }; c1.alignment = { horizontal: 'center', vertical: 'middle' };
+        const c2 = ws.getCell(2, 1); c2.value = `SMK Negeri Tambakboyo  •  Periode ${wbData.bulan} ${wbData.tahun}`;
+        c2.font = { size: 11, color: { argb: 'FF7A5A8C' } }; c2.alignment = { horizontal: 'center', vertical: 'middle' };
+        ws.getRow(1).height = 26; ws.getRow(2).height = 20; ws.getRow(3).height = 8;
+
+        const head = ['No', 'Nama', 'Jabatan', 'Kepegawaian', 'JK', ...tg.map(t => `${t.hari}\n${t.label}`), 'Hadir', 'Sakit', 'Izin', 'Alpa', 'Libur', '% Hadir'];
+        const hr = ws.getRow(4); hr.height = 38;
+        head.forEach((h, i) => {
+          const c = hr.getCell(i + 1); c.value = h;
+          c.font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 10 }; c.fill = headFill; c.border = border;
+          c.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+        });
+
+        list.forEach((g, ri) => {
+          const s = statOf(g); const row = ws.getRow(5 + ri); row.height = 20;
+          const vals = [g.no, g.nama, getJabatanGuru(g), g.statusKepeg || '', g.jk || '',
+            ...tg.map(t => { const v = g.absensi[t.colIndex] || ''; return v ? STATUS[v].label : ''; }),
+            s.h, s.s, s.i, s.a, s.l, s.pct / 100];
+          vals.forEach((v, i) => {
+            const c = row.getCell(i + 1); c.value = v; c.border = border;
+            c.font = { size: 10 };
+            c.alignment = { vertical: 'middle', horizontal: (i === 1 || i === 2) ? 'left' : 'center', wrapText: i === 2 };
+            if (i >= 5 && i < 5 + tg.length) {
+              const raw = g.absensi[tg[i - 5].colIndex] || '';
+              if (raw && fillOf[raw]) { c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: fillOf[raw] } }; c.font = { size: 10, bold: true, color: { argb: fontOf[raw] } }; }
+            } else if (ri % 2 === 1) {
+              c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFDF4FA' } };
+            }
+            if (i === nCols - 1) { c.numFmt = '0%'; c.font = { size: 10, bold: true }; }
+          });
+        });
+        const widths = [6, 36, 38, 14, 6, ...tg.map(() => 15), 8, 8, 8, 8, 8, 10];
+        widths.forEach((w, i) => { ws.getColumn(i + 1).width = w; });
+        ws.autoFilter = { from: { row: 4, column: 1 }, to: { row: 4 + list.length, column: nCols } };
+
+        /* ----- Sheet 2: Ringkasan per tanggal ----- */
+        const ws2 = wb.addWorksheet('Ringkasan per Tanggal', { views: [{ state: 'frozen', ySplit: 1 }] });
+        const h2 = ['Tanggal', 'Agenda Upacara', 'Hadir', 'Sakit', 'Izin', 'Alpa', 'Libur', 'Belum Diisi', '% Hadir'];
+        const r1 = ws2.getRow(1); r1.height = 28;
+        h2.forEach((h, i) => {
+          const c = r1.getCell(i + 1); c.value = h; c.fill = headFill; c.border = border;
+          c.font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 10 }; c.alignment = { horizontal: 'center', vertical: 'middle' };
+        });
+        tg.forEach((t, ri) => {
+          const c = countOfDate(t.colIndex), denom = list.length - c.l;
+          const row = ws2.getRow(2 + ri); row.height = 20;
+          [`${t.hari}, ${t.label}`, t.judulUpacara, c.h, c.s, c.i, c.a, c.l, c.belum, denom > 0 ? c.h / denom : 0].forEach((v, i) => {
+            const cell = row.getCell(i + 1); cell.value = v; cell.border = border; cell.font = { size: 10 };
+            cell.alignment = { vertical: 'middle', horizontal: i < 2 ? 'left' : 'center' };
+            if (i === 8) cell.numFmt = '0%';
+          });
+        });
+        [28, 46, 9, 9, 9, 9, 9, 13, 10].forEach((w, i) => { ws2.getColumn(i + 1).width = w; });
+
+        const buf = await wb.xlsx.writeBuffer();
+        const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `Rekap-Upacara-GTK-${wbData.bulan}-${wbData.tahun}.xlsx`;
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+        toastOk('File Excel (.xlsx) berhasil diunduh.');
+      } catch (err) { toastErr('Gagal membuat Excel: ' + err.message); }
     }
 
     /* =========================== ARSIP =========================== */
     function initArsipFilter() {
       const sel = $('sel-arsip-periode'), prev = sel.value;
       const uniq = [...new Set(wbData.arsipList.map(a => `${a.bulan} ${a.tahun}`))];
-      sel.innerHTML = '<option value="ALL">Semua Bulan</option>' + uniq.map(p => `<option value="${esc(p)}">${esc(p)}</option>`).join('');
+      sel.innerHTML = '<option value="ALL">Semua Periode</option>' + uniq.map(p => `<option value="${esc(p)}">${esc(p)}</option>`).join('');
       if (prev && uniq.includes(prev)) sel.value = prev;
     }
+
+    function pageList(cur, total) {
+      const set = new Set([1, total, cur - 1, cur, cur + 1]);
+      const arr = [...set].filter(n => n >= 1 && n <= total).sort((a, b) => a - b);
+      const out = [];
+      arr.forEach((n, i) => { if (i && n - arr[i - 1] > 1) out.push('…'); out.push(n); });
+      return out;
+    }
+    function gotoArsip(n) { arsipPage = n; renderArsip(); const t = $('arsip-tbody'); if (t) t.closest('.card').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+
     function renderArsip() {
-      const p = $('sel-arsip-periode').value, kw = '';
+      if (!wbData) return;
+      const p = $('sel-arsip-periode').value;
+      const kw = ($('arsip-search').value || '').toLowerCase().trim();
+      const size = Number($('sel-arsip-size').value) || 15;
       const mapNama = {}; wbData.guruList.forEach(g => { mapNama[g.no] = g.nama; });
-      const rows = wbData.arsipList.filter(a => (p === 'ALL' || `${a.bulan} ${a.tahun}` === p) && (!kw || (mapNama[a.no] || '').toLowerCase().includes(kw)));
+      const rows = wbData.arsipList.filter(a =>
+        (p === 'ALL' || `${a.bulan} ${a.tahun}` === p) &&
+        (!kw || (mapNama[a.no] || '').toLowerCase().includes(kw) || String(a.no) === kw));
+
+      // Ringkasan
+      let h = 0, si = 0, al = 0, li = 0;
+      rows.forEach(r => [r.s1, r.s2, r.s3, r.s4, r.s5].forEach(v => {
+        if (v === 'HADIR') h++; else if (v === 'SAKIT' || v === 'IZIN') si++; else if (v === 'TANPA KETERANGAN') al++; else if (v === 'LIBUR UPACARA') li++;
+      }));
+      const dn = h + si + al, rate = dn ? Math.round(h / dn * 100) : 0;
+      const tile = (id, label, icon, cls, sub) => `
+        <div class="card card-hover p-4">
+          <div class="flex items-center justify-between"><span class="text-[11px] font-bold muted">${label}</span><span class="w-8 h-8 rounded-xl ${cls} grid place-items-center">${ic(icon, 'w-4 h-4')}</span></div>
+          <p id="${id}" class="text-2xl font-black mt-2 tracking-tight">0</p>
+          <p class="text-[10.5px] muted mt-0.5">${sub}</p>
+        </div>`;
+      $('arsip-stats').className = 'grid grid-cols-2 lg:grid-cols-4 gap-3 stagger';
+      $('arsip-stats').innerHTML =
+        tile('as-h', 'Total Hadir', 'check-circle', 'st-ok', `Tingkat hadir ${rate}%`) +
+        tile('as-si', 'Sakit / Izin', 'activity', 'st-info', 'Tidak hadir dengan keterangan') +
+        tile('as-a', 'Alpa', 'alert', 'st-bad', 'Tanpa keterangan') +
+        tile('as-l', 'Libur Upacara', 'umbrella', 'st-mute', 'Tidak dihitung');
+      animateNumber($('as-h'), h); animateNumber($('as-si'), si); animateNumber($('as-a'), al); animateNumber($('as-l'), li);
+
+      // Paginasi
+      const total = rows.length, pages = Math.max(1, Math.ceil(total / size));
+      arsipPage = Math.min(Math.max(1, arsipPage), pages);
+      const start = (arsipPage - 1) * size, slice = rows.slice(start, start + size);
+
       const tbody = $('arsip-tbody');
-      if (!rows.length) { tbody.innerHTML = '<tr><td colspan="8" class="py-14 text-center muted">📂 Belum ada data arsip yang cocok.</td></tr>'; return; }
+      if (!total) {
+        tbody.innerHTML = `<tr><td colspan="9" class="py-14 text-center muted"><div class="flex flex-col items-center gap-2"><span class="st-mute w-12 h-12 rounded-2xl grid place-items-center">${ic('inbox', 'w-6 h-6')}</span>Belum ada data arsip yang cocok.</div></td></tr>`;
+        $('arsip-pager').innerHTML = ''; return;
+      }
       const cell = (v) => { if (!v) return '<span class="faint">—</span>'; const s = STATUS[v]; return s ? `<span class="chip ${s.cls} !text-[10px] !py-0.5">${s.label}</span>` : esc(v); };
-      tbody.innerHTML = rows.map(r => `
-        <tr class="row">
-          <td class="py-3 px-4 font-bold">${esc(r.bulan)} ${esc(r.tahun)}</td>
-          <td class="py-3 px-4 font-mono faint">${r.no}</td>
-          <td class="py-3 px-4 font-semibold">${esc(mapNama[r.no] || 'GTK #' + r.no)}</td>
-          <td class="py-3 px-4">${cell(r.s1)}</td><td class="py-3 px-4">${cell(r.s2)}</td><td class="py-3 px-4">${cell(r.s3)}</td><td class="py-3 px-4">${cell(r.s4)}</td><td class="py-3 px-4">${cell(r.s5)}</td>
-        </tr>`).join('');
+      tbody.innerHTML = slice.map((r, idx) => {
+        const vs = [r.s1, r.s2, r.s3, r.s4, r.s5];
+        const rh = vs.filter(v => v === 'HADIR').length, rd = rh + vs.filter(v => v === 'SAKIT' || v === 'IZIN' || v === 'TANPA KETERANGAN').length;
+        const rp = rd ? Math.round(rh / rd * 100) : null;
+        const bar = rp === null ? '<span class="faint">—</span>' :
+          `<div class="flex items-center gap-2 min-w-[96px]"><div class="bar-track !h-1.5 flex-1"><div class="bar-fill" style="width:${rp}%;background-color:${rp >= 75 ? 'var(--ok)' : rp >= 50 ? 'var(--warn)' : 'var(--bad)'}"></div></div><b class="text-[10.5px]">${rp}%</b></div>`;
+        return `
+        <tr class="row row-in" style="--i:${Math.min(idx, 14)}">
+          <td class="py-2.5 px-4 font-bold">${esc(r.bulan)} ${esc(r.tahun)}</td>
+          <td class="py-2.5 px-4 font-mono faint">${r.no}</td>
+          <td class="py-2.5 px-4 font-semibold">${esc(mapNama[r.no] || 'GTK #' + r.no)}</td>
+          <td class="py-2.5 px-4">${cell(r.s1)}</td><td class="py-2.5 px-4">${cell(r.s2)}</td><td class="py-2.5 px-4">${cell(r.s3)}</td><td class="py-2.5 px-4">${cell(r.s4)}</td><td class="py-2.5 px-4">${cell(r.s5)}</td>
+          <td class="py-2.5 px-4">${bar}</td>
+        </tr>`;
+      }).join('');
+
+      const btns = pageList(arsipPage, pages).map(n => n === '…' ? '<span class="faint px-1">…</span>' : `<button class="pg ${n === arsipPage ? 'on' : ''}" onclick="gotoArsip(${n})">${n}</button>`).join('');
+      $('arsip-pager').innerHTML = `
+        <p class="text-xs muted">Menampilkan <b>${start + 1}–${start + slice.length}</b> dari <b>${total}</b> data</p>
+        <div class="flex items-center gap-1.5 flex-wrap justify-center">
+          <button class="pg" onclick="gotoArsip(${arsipPage - 1})" ${arsipPage <= 1 ? 'disabled' : ''} aria-label="Sebelumnya">${ic('chev-l', 'w-4 h-4')}</button>
+          ${btns}
+          <button class="pg" onclick="gotoArsip(${arsipPage + 1})" ${arsipPage >= pages ? 'disabled' : ''} aria-label="Berikutnya">${ic('chev-r', 'w-4 h-4')}</button>
+        </div>`;
     }
 
     /* =========================== HARI KHUSUS =========================== */
     function openSpecialModal() {
       if (!wbData) return;
-      $('inp-special-date').value = todayIso();
+      setDP(todayIso()); toggleDP(false);
       $('inp-special-title').value = '';
       openModal('special-modal');
       setTimeout(() => $('inp-special-title').focus(), 250);
     }
-    const MONTHS_ID = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
     function setQuickSpecial(title, mmdd) {
       $('inp-special-title').value = title;
-      if (mmdd) {
-        const mi = MONTHS_ID.indexOf(wbData.bulan);
-        const year = wbData.tahun || new Date().getFullYear();
-        $('inp-special-date').value = `${year}-${mmdd}`;
-        void mi;
-      }
+      if (mmdd) setDP(`${wbData.tahun || new Date().getFullYear()}-${mmdd}`);
     }
     async function submitSpecialCeremony(e) {
       e.preventDefault();
       const tanggalIso = $('inp-special-date').value;
       const judulUpacara = $('inp-special-title').value.trim();
+      if (!tanggalIso) { toastErr('Pilih tanggal pelaksanaan terlebih dahulu.'); toggleDP(true); return; }
       if (wbData.tanggalList.some(t => t.iso === tanggalIso)) { toastErr('Tanggal tersebut sudah ada di jadwal upacara.'); return; }
       const btn = $('btn-save-special'); btn.disabled = true; btn.textContent = 'Menambahkan…';
       try {
@@ -1931,7 +2316,7 @@
       finally { btn.disabled = false; btn.textContent = 'Tambahkan Jadwal'; }
     }
     async function hapusJadwalKolom(colIndex, label) {
-      const ok = await confirmDialog({ title: 'Hapus jadwal khusus?', message: `Jadwal upacara tanggal ${label} beserta seluruh data absensinya akan dihapus.`, okText: 'Ya, hapus', danger: true, icon: '🗑️' });
+      const ok = await confirmDialog({ title: 'Hapus jadwal khusus?', message: `Jadwal upacara tanggal ${label} beserta seluruh data absensinya akan dihapus.`, okText: 'Ya, hapus', danger: true, icon: 'trash' });
       if (!ok) return;
       try {
         const res = await callApiPost({ action: 'removeDateCol', colIndex });
@@ -1940,18 +2325,27 @@
       } catch (err) { toastErr("Gagal: " + err.message); }
     }
 
+    function stepTahun(d) {
+      const i = $('inp-tahun'); const v = Number(i.value) || new Date().getFullYear();
+      i.value = v + d; ubahPeriode();
+    }
     async function ubahPeriode() {
-      const bulan = $('sel-bulan').value, tahun = $('inp-tahun').value;
+      const bulan = $('sel-bulan').value, tahun = $('inp-tahun').value.trim();
+      if (!/^\d{4}$/.test(tahun) || Number(tahun) < 2000 || Number(tahun) > 2100) {
+        toastErr('Tahun tidak valid. Isi 4 digit, misalnya 2026.');
+        if (wbData) $('inp-tahun').value = wbData.tahun; return;
+      }
       showToast(`Menyusun jadwal Senin ${bulan} ${tahun}…`);
       try {
         const res = await callApiPost({ action: 'changePeriode', bulan, tahun });
         if (!res.success) throw new Error(res.message);
-        wbData = res.data; lastSync = Date.now(); renderAll();
+        wbData = res.data; lastSync = Date.now(); arsipPage = 1; renderAll();
         toastOk(`Periode ${bulan} ${tahun} siap.`);
       } catch (err) { toastErr("Gagal: " + err.message); }
     }
 
     /* =========================== TTD =========================== */
+    const UPLOAD_LABEL = 'Unggah gambar tanda tangan (PNG/JPG)';
     function initSignaturePad() {
       const canvas = $('sig-canvas'), ctx = canvas.getContext('2d');
       ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#0f172a';
@@ -1968,7 +2362,7 @@
     }
     function clearCanvas() {
       const c = $('sig-canvas'); c.getContext('2d').clearRect(0, 0, c.width, c.height);
-      hasDrawn = false; $('upload-ttd-file').value = '';
+      hasDrawn = false; $('upload-ttd-file').value = ''; $('upload-ttd-name').textContent = UPLOAD_LABEL;
     }
     function openTtdModal(no) {
       activeTtdGuru = wbData.guruList.find(g => g.no === no); if (!activeTtdGuru) return;
@@ -1987,6 +2381,7 @@
     }
     function handleUploadTtd(e) {
       const file = e.target.files[0]; if (!file) return;
+      $('upload-ttd-name').textContent = file.name;
       const reader = new FileReader();
       reader.onload = (ev) => {
         const img = new Image();
@@ -2028,16 +2423,15 @@
     function renderPalette() {
       const q = $('palette-input').value.toLowerCase().trim();
       const actions = [
-        { ic: '📊', t: 'Buka Dashboard', s: 'Halaman', run: () => switchPage('dashboard') },
-        { ic: '✅', t: 'Kelola Absensi & TTD', s: 'Halaman', run: () => switchPage('kelola') },
-        { ic: '🖨️', t: 'Laporan & Cetak', s: 'Halaman', run: () => switchPage('laporan') },
-        { ic: '🗂️', t: 'Arsip Bulanan', s: 'Halaman', run: () => switchPage('arsip') },
-        { ic: '📅', t: 'Tambah Hari Khusus Upacara', s: 'Aksi', run: () => openSpecialModal() },
-        { ic: '⬇️', t: 'Ekspor Rekap CSV', s: 'Aksi', run: () => exportCSV() },
-        { ic: '💬', t: 'Salin Laporan WhatsApp', s: 'Aksi', run: () => copyRekapWA() },
-        { ic: '📈', t: 'Cetak Rekap Bulanan', s: 'Aksi', run: () => { setLaporanMode('rekap'); switchPage('laporan'); } },
-        { ic: '🌓', t: 'Ganti Tema Terang/Gelap', s: 'Aksi', run: () => toggleTheme() },
-        { ic: '🔄', t: 'Sinkronkan Data', s: 'Aksi', run: () => loadWorkbook(true) }
+        { ic: 'grid', t: 'Buka Dashboard', s: 'Halaman', run: () => switchPage('dashboard') },
+        { ic: 'check-circle', t: 'Kelola Absensi & TTD', s: 'Halaman', run: () => switchPage('kelola') },
+        { ic: 'printer', t: 'Laporan & Cetak', s: 'Halaman', run: () => switchPage('laporan') },
+        { ic: 'archive', t: 'Arsip Bulanan', s: 'Halaman', run: () => switchPage('arsip') },
+        { ic: 'calendar', t: 'Tambah Hari Khusus Upacara', s: 'Aksi', run: () => openSpecialModal() },
+        { ic: 'sheet', t: 'Ekspor Rekap ke Excel', s: 'Aksi', run: () => exportExcel() },
+        { ic: 'trend', t: 'Cetak Rekap Bulanan', s: 'Aksi', run: () => { setLaporanMode('rekap'); switchPage('laporan'); } },
+        { ic: 'moon', t: 'Ganti Tema Terang/Gelap', s: 'Aksi', run: () => toggleTheme() },
+        { ic: 'refresh', t: 'Sinkronkan Data', s: 'Aksi', run: () => loadWorkbook(true) }
       ].filter(a => !q || a.t.toLowerCase().includes(q));
       const gtk = q ? wbData.guruList.filter(g => g.nama.toLowerCase().includes(q) || getJabatanGuru(g).toLowerCase().includes(q) || String(g.no) === q).slice(0, 8)
         .map(g => ({ ic: initials(g.nama), av: hue(g.nama), t: g.nama, s: getJabatanGuru(g), run: () => openDetail(g.no) })) : [];
@@ -2045,7 +2439,7 @@
       if (paletteIdx >= paletteItems.length) paletteIdx = 0;
       $('palette-list').innerHTML = paletteItems.length ? paletteItems.map((it, i) => `
         <button data-i="${i}" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition ${i === paletteIdx ? 'bg-[var(--primary-soft)]' : 'hover:bg-[var(--surface2)]'}" onmouseenter="paletteIdx=${i};paintPalette()" onclick="runPalette(${i})">
-          ${it.av != null ? `<span class="avatar !w-8 !h-8 !text-[11px]" style="--h:${it.av}">${esc(it.ic)}</span>` : `<span class="w-8 h-8 grid place-items-center rounded-xl" style="background:var(--surface2)">${it.ic}</span>`}
+          ${it.av != null ? `<span class="avatar !w-8 !h-8 !text-[11px]" style="--h:${it.av}">${esc(it.ic)}</span>` : `<span class="w-8 h-8 grid place-items-center rounded-xl" style="background:var(--surface2)">${ic(it.ic)}</span>`}
           <span class="min-w-0 flex-1"><span class="block text-[13px] font-bold truncate">${esc(it.t)}</span><span class="block text-[10.5px] muted truncate">${esc(it.s)}</span></span>
         </button>`).join('') : '<p class="text-xs muted text-center py-8">Tidak ada hasil.</p>';
     }
