@@ -694,7 +694,7 @@
                 <th class="border border-black py-2 px-1.5 w-9">NO</th>
                 <th class="border border-black py-2 px-2.5">NAMA</th>
                 <th class="border border-black py-2 px-2 w-44">JABATAN</th>
-                <th colspan="2" class="border border-black py-2 px-2 w-52">TANDA TANGAN</th>
+                <th colspan="2" class="border border-black py-2 px-2 w-72">TANDA TANGAN</th>
               </tr>
             </thead>
             <tbody id="tbody-daftar-pdf"></tbody>
@@ -1779,6 +1779,29 @@
 
     function renderLaporan() { if (!wbData) return; if (lapMode === 'harian') renderDaftarHadirLaporan(); else renderRekapBulanan(); }
 
+    // ======================= UKURAN TANDA TANGAN DI LAPORAN =======================
+    // Ubah angka di bawah ini jika ingin lebih besar / lebih kecil:
+    const TTD_IMG_TINGGI = '6.5rem';   // tinggi gambar TTD asli (sebelumnya 3.4rem)
+    const TTD_FONT_PENDEK = 42;        // ukuran font TTD otomatis, nama <= 12 huruf
+    const TTD_FONT_SEDANG = 34;        // nama 13-18 huruf
+    const TTD_FONT_PANJANG = 27;       // nama > 18 huruf
+
+    // TTD dibuat "melayang" di tengah kolom (position:absolute) sehingga boleh melewati
+    // garis kolom tanpa membuat baris tabel membesar. Variasi miring/posisi tetap per GTK
+    // (berdasarkan nomor) agar terlihat seperti tanda tangan tangan masing-masing orang.
+    function renderSignatureLaporan(g) {
+      const rot = ((g.no * 37) % 9) - 4;      // -4° s/d +4°
+      const dy = ((g.no * 53) % 7) - 3;       // -3px s/d +3px
+      const dx = ((g.no * 29) % 9) - 4;       // -4px s/d +4px
+      const tf = `transform:translate(${dx}px,${dy}px) rotate(${rot}deg);`;
+      if (g.ttdUrl) {
+        return `<img src="${esc(g.ttdUrl)}" alt="TTD ${esc(g.nama)}" style="height:${TTD_IMG_TINGGI};width:auto;max-width:none;object-fit:contain;display:block;${tf}">`;
+      }
+      const nama = namaBersih(g.nama);
+      const fs = nama.length <= 12 ? TTD_FONT_PENDEK : nama.length <= 18 ? TTD_FONT_SEDANG : TTD_FONT_PANJANG;
+      return `<span class="font-ttd select-none" style="font-size:${fs}px;line-height:1;white-space:nowrap;display:block;color:#000;${tf}">${esc(nama)}</span>`;
+    }
+
     function renderDaftarHadirLaporan() {
       const col = Number($('select-tanggal-laporan').value);
       const t = wbData.tanggalList.find(x => x.colIndex === col);
@@ -1789,15 +1812,18 @@
       $('tbody-daftar-pdf').innerHTML = wbData.guruList.map(g => {
         const st = g.absensi[col] || '';
         const odd = g.no % 2 === 1;
-        const cell = st === 'HADIR' ? renderSignatureVisual(g, 'h-8') : st ? `<span class="text-[10.5px] font-bold uppercase">${esc(st)}</span>` : '';
-        const wrap = `<div class="flex items-center gap-1.5 h-10 px-1.5"><span class="text-[10.5px] w-4 shrink-0">${g.no}</span><div class="flex-1 text-center">${cell}</div></div>`;
+        const isHadir = st === 'HADIR';
+        const cell = isHadir
+          ? `<div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:5;pointer-events:none;white-space:nowrap">${renderSignatureLaporan(g)}</div>`
+          : st ? `<span class="text-[10.5px] font-bold uppercase">${esc(st)}</span>` : '';
+        const wrap = `<div class="flex items-center gap-1.5 h-16 px-1.5" style="position:relative"><span class="text-[10.5px] w-4 shrink-0">${g.no}</span><div class="flex-1 min-w-0 h-full flex items-center justify-center" style="position:relative">${cell}</div></div>`;
         return `
           <tr>
             <td class="border border-black py-1 px-1.5 text-center align-middle">${g.no}</td>
             <td class="border border-black py-1 px-2 text-left align-middle font-normal">${esc(g.nama)}</td>
             <td class="border border-black py-1 px-2 text-left align-middle text-[10px] leading-tight">${esc(getJabatanGuru(g))}</td>
-            <td class="border-y border-l border-black p-0 w-28 align-middle">${odd ? wrap : '<div class="h-10"></div>'}</td>
-            <td class="border-y border-r border-black p-0 w-28 align-middle">${!odd ? wrap : '<div class="h-10"></div>'}</td>
+            <td class="border-y border-l border-black p-0 w-36 align-middle" style="overflow:visible">${odd ? wrap : '<div class="h-16"></div>'}</td>
+            <td class="border-y border-r border-black p-0 w-36 align-middle" style="overflow:visible">${!odd ? wrap : '<div class="h-16"></div>'}</td>
           </tr>`;
       }).join('');
     }
