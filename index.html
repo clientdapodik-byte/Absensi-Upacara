@@ -495,31 +495,29 @@
       <div class="flex-1 px-3.5 py-5 space-y-1 overflow-y-auto">
         <button onclick="openPalette()" class="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-xs muted mb-3 transition hover:border-violet-400" style="background:var(--surface2);border:1px solid var(--border)">
           <i data-ic="search" data-cls="w-3.5 h-3.5"></i>
-          <span class="flex-1 text-left">Cari cepat…</span><span class="kbd">Ctrl K</span>
+          <span class="flex-1 text-left">Cari cepat… </span>
         </button>
         <p class="px-3 text-[10px] font-extrabold uppercase tracking-widest faint mb-2">Menu Pengelola</p>
         <button onclick="switchPage('dashboard')" id="side-dashboard" class="nav-item active">
           <i data-ic="grid" data-cls="w-[18px] h-[18px]"></i>
-          <span class="flex-1 text-left">Dashboard</span><span class="kbd">Alt 1</span>
+          <span class="flex-1 text-left">Dashboard </span>
         </button>
         <button onclick="switchPage('kelola')" id="side-kelola" class="nav-item">
           <i data-ic="check-circle" data-cls="w-[18px] h-[18px]"></i>
-          <span class="flex-1 text-left">Kelola Absensi & TTD</span><span class="kbd">Alt 2</span>
+          <span class="flex-1 text-left">Kelola Absensi & TTD </span>
         </button>
         <button onclick="switchPage('laporan')" id="side-laporan" class="nav-item">
           <i data-ic="printer" data-cls="w-[18px] h-[18px]"></i>
-          <span class="flex-1 text-left">Laporan & Cetak</span><span class="kbd">Alt 3</span>
+          <span class="flex-1 text-left">Laporan & Cetak </span>
         </button>
         <button onclick="switchPage('arsip')" id="side-arsip" class="nav-item">
           <i data-ic="archive" data-cls="w-[18px] h-[18px]"></i>
-          <span class="flex-1 text-left">Arsip Bulanan</span><span class="kbd">Alt 4</span>
+          <span class="flex-1 text-left">Arsip Bulanan </span>
         </button>
 
         <div class="pt-4 mt-4" style="border-top:1px solid var(--border)">
           <p class="px-3 text-[10px] font-extrabold uppercase tracking-widest faint mb-2">Aksi Cepat</p>
           <button onclick="openSpecialModal()" class="btn btn-amber w-full !py-2.5"><i data-ic="calendar"></i> Tambah Hari Khusus</button>
-          <button onclick="openBulkTtd()" class="btn btn-soft w-full !py-2.5 mt-2"><i data-ic="upload"></i> Unggah TTD Massal</button>
-          <button onclick="exportExcel()" class="btn btn-soft w-full !py-2.5 mt-2"><i data-ic="sheet"></i> Ekspor ke Excel</button>
         </div>
       </div>
 
@@ -615,9 +613,6 @@
               </div>
               <div class="h-2 rounded-full bg-white/25 overflow-hidden"><div id="hero-prog" class="h-full rounded-full bg-white" style="width:0;transition:width .9s cubic-bezier(.22,1,.36,1);box-shadow:0 0 12px #fff"></div></div>
               <div class="flex flex-wrap gap-2 mt-4">
-                <button onclick="heroAbsen()" class="btn hero-btn solid"><i data-ic="pen"></i> Mulai Absen</button>
-                <button onclick="heroCetak()" class="btn hero-btn"><i data-ic="printer"></i> Cetak Daftar Hadir</button>
-                <button onclick="openSpecialModal()" class="btn hero-btn"><i data-ic="plus"></i> Hari Khusus</button>
               </div>
             </div>
           </div>
@@ -2119,19 +2114,19 @@
 
     function renderLaporan() { if (!wbData) return; if (lapMode === 'harian') renderDaftarHadirLaporan(); else renderRekapBulanan(); }
 
-    // ======================= UKURAN TANDA TANGAN DI LAPORAN =======================
-    const TTD_IMG_TINGGI = '6.5rem';   // tinggi gambar TTD asli
-    const TTD_FONT_PENDEK = 42;        // font TTD otomatis, nama <= 12 huruf
-    const TTD_FONT_SEDANG = 34;        // nama 13-18 huruf
-    const TTD_FONT_PANJANG = 27;       // nama > 18 huruf
+// ======================= UKURAN TANDA TANGAN DI LAPORAN =======================
+    const TTD_IMG_TINGGI = '4.2rem';   // tinggi gambar TTD asli (baris = 4rem)
+    const TTD_FONT_PENDEK = 28;        // font TTD otomatis, nama <= 12 huruf
+    const TTD_FONT_SEDANG = 23;        // nama 13-18 huruf
+    const TTD_FONT_PANJANG = 19;       // nama > 18 huruf   
 
     function renderSignatureLaporan(g) {
-      const rot = ((g.no * 37) % 9) - 4;
-      const dy = ((g.no * 53) % 7) - 3;
-      const dx = ((g.no * 29) % 9) - 4;
+      const rot = ((g.no * 37) % 7) - 3;
+      const dy = ((g.no * 53) % 5) - 2;
+      const dx = ((g.no * 29) % 7) - 3;
       const tf = `transform:translate(${dx}px,${dy}px) rotate(${rot}deg);`;
       if (g.ttdUrl) {
-        return `<img src="${esc(g.ttdUrl)}" alt="TTD ${esc(g.nama)}" style="height:${TTD_IMG_TINGGI};width:auto;max-width:none;object-fit:contain;display:block;${tf}">`;
+        return `<img src="${esc(g.ttdUrl)}" alt="TTD ${esc(g.nama)}" style="height:${TTD_IMG_TINGGI};width:auto;max-width:120px;object-fit:contain;display:block;${tf}">`;
       }
       const nama = namaBersih(g.nama);
       const fs = nama.length <= 12 ? TTD_FONT_PENDEK : nama.length <= 18 ? TTD_FONT_SEDANG : TTD_FONT_PANJANG;
