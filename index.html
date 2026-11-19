@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#0c0516">
+  <meta name="theme-color" content="#08061a">
   <title>SIM Absensi Upacara GTK — SMK Negeri Tambakboyo</title>
   <script>
-    // Terapkan tema sebelum render agar tidak berkedip (bawaan: mode gelap "konser malam")
+    // Terapkan tema sebelum render agar tidak berkedip (bawaan: mode gelap "galaksi malam")
     (function () {
       try {
         var t = localStorage.getItem('smk_theme');
@@ -28,25 +28,25 @@
   </script>
   <style>
     :root {
-      --bg: #fff4fa; --surface: #ffffff; --surface2: #fdeaf5; --border: #f6d3e8; --line: #e9b8d6;
-      --text: #2a1038; --muted: #7a5a8c; --faint: #b394c4;
-      --primary: #ff2d95; --primary-h: #e01a80; --primary2: #8b5cf6; --primary-soft: #ffe6f3; --cyan: #06b6d4;
+      --bg: #f5f1ff; --surface: #ffffff; --surface2: #efe8ff; --border: #ddd0fa; --line: #c4b0f0;
+      --text: #1e1238; --muted: #6b5a8f; --faint: #a898cc;
+      --primary: #7c3aed; --primary-h: #6d28d9; --primary2: #3b82f6; --primary-soft: #ece4ff; --cyan: #14b8a6;
       --ok: #059e78; --ok-soft: #dcfbef; --warn: #d97706; --warn-soft: #fff3dd;
       --info: #0891b2; --info-soft: #dcf6fb; --bad: #e11d48; --bad-soft: #ffe4ec;
-      --mute: #6b5b7b; --mute-soft: #f3eaf7;
-      --shadow: 0 1px 2px rgba(120,20,90,.05), 0 12px 30px -14px rgba(180,30,120,.22);
-      --ring: rgba(255,45,149,.25); --grid: #f7e3ef;
+      --mute: #6b5b7b; --mute-soft: #efe9f8;
+      --shadow: 0 1px 2px rgba(60,20,140,.05), 0 12px 30px -14px rgba(90,40,200,.25);
+      --ring: rgba(124,58,237,.25); --grid: #e9e0fb;
       --ease: cubic-bezier(.22,1,.36,1);
     }
     html[data-theme="dark"] {
-      --bg: #0c0516; --surface: #170a2a; --surface2: #21103b; --border: #3a1d60; --line: #52308a;
-      --text: #f7ecff; --muted: #b9a0d6; --faint: #7d63a3;
-      --primary: #ff4fa8; --primary-h: #ff7bbd; --primary2: #a78bfa; --primary-soft: #3a1245; --cyan: #22d3ee;
+      --bg: #08061a; --surface: #120e2b; --surface2: #1c1640; --border: #33295f; --line: #4b3d85;
+      --text: #f1ecff; --muted: #b3a6dd; --faint: #7566a8;
+      --primary: #a78bfa; --primary-h: #c4b5fd; --primary2: #60a5fa; --primary-soft: #2a1f5c; --cyan: #5eead4;
       --ok: #34e8b4; --ok-soft: #082a24; --warn: #fbbf24; --warn-soft: #2e2410;
       --info: #38d4f5; --info-soft: #0a2a35; --bad: #ff6b8f; --bad-soft: #38102a;
-      --mute: #d6c4ea; --mute-soft: #2a1747;
-      --shadow: 0 1px 2px rgba(0,0,0,.35), 0 14px 34px -14px rgba(255,79,168,.28);
-      --ring: rgba(255,79,168,.3); --grid: #2a1547;
+      --mute: #d6c4ea; --mute-soft: #251c4f;
+      --shadow: 0 1px 2px rgba(0,0,0,.35), 0 14px 34px -14px rgba(124,92,255,.35);
+      --ring: rgba(167,139,250,.3); --grid: #241c4d;
     }
     * { -webkit-tap-highlight-color: transparent; }
     html { scroll-behavior: smooth; }
@@ -65,17 +65,17 @@
     /* ---------- Panggung: lampu sorot, aurora, bintang ---------- */
     .aurora { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
     .aurora i { position: absolute; border-radius: 50%; filter: blur(90px); opacity: .42; animation: drift 18s ease-in-out infinite; }
-    .aurora i:nth-child(1) { width: 520px; height: 520px; left: -120px; top: -140px; background: #ff6ec7; }
-    .aurora i:nth-child(2) { width: 460px; height: 460px; right: -120px; top: 22%; background: #22d3ee; animation-delay: -6s; }
-    .aurora i:nth-child(3) { width: 440px; height: 440px; left: 35%; bottom: -220px; background: #8b5cf6; animation-delay: -11s; }
-    html[data-theme="dark"] .aurora i { opacity: .28; }
+    .aurora i:nth-child(1) { width: 520px; height: 520px; left: -120px; top: -140px; background: #a78bfa; }
+    .aurora i:nth-child(2) { width: 460px; height: 460px; right: -120px; top: 22%; background: #60a5fa; animation-delay: -6s; }
+    .aurora i:nth-child(3) { width: 440px; height: 440px; left: 35%; bottom: -220px; background: #5eead4; animation-delay: -11s; }
+    html[data-theme="dark"] .aurora i { opacity: .26; }
     @keyframes drift { 50% { transform: translate(60px, -40px) scale(1.12); } }
     .aurora b { position: absolute; top: -30%; width: 260px; height: 160%; transform-origin: top center; filter: blur(22px); opacity: .16; animation: sweep 9s ease-in-out infinite; }
-    .aurora b:nth-child(4) { left: 18%; background: linear-gradient(180deg, #ff4fa8, transparent 72%); }
-    .aurora b:nth-child(5) { right: 16%; background: linear-gradient(180deg, #22d3ee, transparent 72%); animation-delay: -4.5s; animation-direction: reverse; }
+    .aurora b:nth-child(4) { left: 18%; background: linear-gradient(180deg, #a78bfa, transparent 72%); }
+    .aurora b:nth-child(5) { right: 16%; background: linear-gradient(180deg, #38bdf8, transparent 72%); animation-delay: -4.5s; animation-direction: reverse; }
     html[data-theme="dark"] .aurora b { opacity: .34; }
     @keyframes sweep { 0%, 100% { transform: rotate(-20deg); } 50% { transform: rotate(20deg); } }
-    .spk { position: absolute; background: var(--c, #ff4fa8); clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%); opacity: 0; animation: twinkle var(--d, 4s) ease-in-out infinite; animation-delay: var(--dl, 0s); }
+    .spk { position: absolute; background: var(--c, #a78bfa); clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%); opacity: 0; animation: twinkle var(--d, 4s) ease-in-out infinite; animation-delay: var(--dl, 0s); }
     @keyframes twinkle { 0%, 100% { opacity: 0; transform: scale(.3) rotate(0deg); } 50% { opacity: .9; transform: scale(1) rotate(90deg); } }
 
     /* ---------- Ikon ---------- */
@@ -83,7 +83,7 @@
 
     /* ---------- Ticker ---------- */
     .ticker { overflow: hidden; border-radius: 16px; border: 1px solid var(--border); background: linear-gradient(90deg, var(--primary-soft), var(--surface), var(--primary-soft)); padding: .55rem 0; }
-    .ticker-track { display: flex; width: max-content; animation: tick 32s linear infinite; }
+    .ticker-track { display: flex; width: max-content; animation: tick 34s linear infinite; }
     .ticker:hover .ticker-track { animation-play-state: paused; }
     .tk { display: inline-flex; align-items: center; gap: .55rem; margin-right: 2.2rem; font-weight: 800; font-size: .66rem; letter-spacing: .2em; color: var(--primary); white-space: nowrap; }
     .tk svg { color: var(--cyan); }
@@ -120,10 +120,10 @@
     .btn-primary:hover { box-shadow: 0 12px 26px -8px var(--ring), 0 0 24px -4px var(--primary); transform: translateY(-1px); }
     .btn-primary::after { content: ""; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,.45) 50%, transparent 70%); transform: translateX(-130%); transition: transform .7s var(--ease); pointer-events: none; }
     .btn-primary:hover::after { transform: translateX(130%); }
-    html[data-theme="dark"] .btn-primary { color: #1a0630; }
+    html[data-theme="dark"] .btn-primary { color: #140a33; }
     .btn-ok { background: var(--ok); color: #fff; } .btn-ok:hover { filter: brightness(1.08); }
     .btn-bad { background: var(--bad); color: #fff; } .btn-bad:hover { filter: brightness(1.08); }
-    html[data-theme="dark"] .btn-ok, html[data-theme="dark"] .btn-bad { color: #1a0630; }
+    html[data-theme="dark"] .btn-ok, html[data-theme="dark"] .btn-bad { color: #140a33; }
     .btn-soft { background: var(--surface2); color: var(--text); border-color: var(--border); }
     .btn-soft:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-1px); }
     .btn-amber { background: var(--warn-soft); color: var(--warn); border-color: color-mix(in srgb, var(--warn) 30%, transparent); }
@@ -158,7 +158,7 @@
     .cb:checked, .cb:indeterminate { background: linear-gradient(135deg, var(--primary), var(--primary2)); border-color: transparent; box-shadow: 0 0 12px -2px var(--primary); }
     .cb:checked::after { transform: rotate(-45deg) scale(1); }
     .cb:indeterminate::after { width: 9px; height: 0; border-left: 0; margin: 0; transform: none; }
-    html[data-theme="dark"] .cb:checked::after, html[data-theme="dark"] .cb:indeterminate::after { border-color: #1a0630; }
+    html[data-theme="dark"] .cb:checked::after, html[data-theme="dark"] .cb:indeterminate::after { border-color: #140a33; }
 
     /* Stepper tahun */
     .stepper { display: inline-flex; align-items: center; background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; transition: border-color .2s, box-shadow .2s; }
@@ -182,7 +182,7 @@
     .dp-day.out { color: var(--faint); opacity: .55; }
     .dp-day.today { box-shadow: inset 0 0 0 1.5px var(--primary); }
     .dp-day.sel { background: linear-gradient(135deg, var(--primary), var(--primary2)); color: #fff; opacity: 1; box-shadow: 0 0 14px -2px var(--primary); }
-    html[data-theme="dark"] .dp-day.sel { color: #1a0630; }
+    html[data-theme="dark"] .dp-day.sel { color: #140a33; }
     .dp-day.has::after { content: ""; position: absolute; bottom: 4px; left: 50%; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: var(--warn); }
 
     /* Tooltip kustom */
@@ -214,7 +214,7 @@
     .seg-btn.on-info { background: var(--info); color: #fff; box-shadow: 0 4px 12px -3px color-mix(in srgb, var(--info) 70%, transparent); }
     .seg-btn.on-bad { background: var(--bad); color: #fff; box-shadow: 0 4px 12px -3px color-mix(in srgb, var(--bad) 70%, transparent); }
     .seg-btn.on-mute { background: var(--mute); color: var(--surface); }
-    html[data-theme="dark"] .seg-btn[class*="on-"] { color: #1a0630; }
+    html[data-theme="dark"] .seg-btn[class*="on-"] { color: #140a33; }
     tr.flash .seg-btn[class*="on-"] { animation: pop .45s cubic-bezier(.34,1.56,.64,1); }
     @keyframes pop { 0% { transform: scale(.7); } 100% { transform: scale(1); } }
 
@@ -222,14 +222,14 @@
     .pill { position: relative; overflow: hidden; font-size: .72rem; font-weight: 600; padding: .45rem .8rem; border-radius: 9999px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); cursor: pointer; transition: all .2s var(--ease); }
     .pill:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-1px); }
     .pill.active { background: linear-gradient(135deg, var(--primary), var(--primary2)); border-color: transparent; color: #fff; box-shadow: 0 0 16px -4px var(--primary); }
-    html[data-theme="dark"] .pill.active { color: #1a0630; }
+    html[data-theme="dark"] .pill.active { color: #140a33; }
     .pill .cnt { opacity: .75; margin-left: .25rem; font-weight: 700; }
 
     /* Paginasi arsip */
     .pg { min-width: 34px; height: 34px; padding: 0 .55rem; border-radius: 10px; font-size: .74rem; font-weight: 700; border: 1px solid var(--border); background: var(--surface); color: var(--muted); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all .2s var(--ease); }
     .pg:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); transform: translateY(-1px); }
     .pg.on { background: linear-gradient(135deg, var(--primary), var(--primary2)); border-color: transparent; color: #fff; box-shadow: 0 0 14px -3px var(--primary); }
-    html[data-theme="dark"] .pg.on { color: #1a0630; }
+    html[data-theme="dark"] .pg.on { color: #140a33; }
     .pg:disabled { opacity: .4; cursor: not-allowed; }
 
     /* Navigasi */
@@ -261,7 +261,7 @@
     @keyframes shine { to { background-position: 220% center; } }
 
     /* Progress bar atas */
-    #top-progress { position: fixed; top: 0; left: 0; height: 3px; width: 0; z-index: 100; background: linear-gradient(90deg, #ff2d95, #8b5cf6, #22d3ee); box-shadow: 0 0 12px #ff2d95; border-radius: 0 3px 3px 0; opacity: 0; transition: width .4s var(--ease), opacity .3s; }
+    #top-progress { position: fixed; top: 0; left: 0; height: 3px; width: 0; z-index: 100; background: linear-gradient(90deg, #7c3aed, #3b82f6, #5eead4); box-shadow: 0 0 12px #7c3aed; border-radius: 0 3px 3px 0; opacity: 0; transition: width .4s var(--ease), opacity .3s; }
     #top-progress.on { opacity: 1; }
 
     /* Skeleton */
@@ -270,7 +270,7 @@
     @keyframes shimmer { 100% { transform: translateX(100%); } }
 
     /* Modal */
-    .modal { position: fixed; inset: 0; z-index: 70; display: flex; align-items: center; justify-content: center; padding: 1rem; background: rgba(20,4,36,.55); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .25s var(--ease), visibility .25s; }
+    .modal { position: fixed; inset: 0; z-index: 70; display: flex; align-items: center; justify-content: center; padding: 1rem; background: rgba(10,6,30,.6); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .25s var(--ease), visibility .25s; }
     .modal.open { opacity: 1; visibility: visible; pointer-events: auto; }
     .modal-panel { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 26px; box-shadow: 0 30px 80px -20px rgba(0,0,0,.5), 0 0 40px -18px var(--primary); transform: translateY(24px) scale(.95); transition: transform .45s cubic-bezier(.34,1.3,.64,1); max-height: 92vh; overflow-y: auto; }
     .modal.open .modal-panel { transform: none; }
@@ -282,13 +282,13 @@
     /* Toast */
     #toast-box { position: fixed; z-index: 90; right: 1.25rem; bottom: 1.25rem; display: flex; flex-direction: column; gap: .5rem; align-items: flex-end; pointer-events: none; }
     @media (max-width: 1023px) { #toast-box { bottom: 4.75rem; right: .75rem; left: .75rem; align-items: stretch; } }
-    .toast { pointer-events: auto; display: flex; align-items: center; gap: .65rem; max-width: 380px; padding: .7rem .9rem; border-radius: 14px; font-size: .78rem; font-weight: 500; background: #240a3f; color: #fff; border: 1px solid rgba(255,79,168,.4); box-shadow: 0 18px 40px -12px rgba(0,0,0,.5), 0 0 22px -8px #ff4fa8; opacity: 0; transform: translateY(14px) scale(.94); transition: opacity .3s var(--ease), transform .4s cubic-bezier(.34,1.4,.64,1); }
-    html[data-theme="dark"] .toast { background: #fff0f8; color: #2a1038; }
+    .toast { pointer-events: auto; display: flex; align-items: center; gap: .65rem; max-width: 380px; padding: .7rem .9rem; border-radius: 14px; font-size: .78rem; font-weight: 500; background: #1d1245; color: #fff; border: 1px solid rgba(167,139,250,.45); box-shadow: 0 18px 40px -12px rgba(0,0,0,.5), 0 0 22px -8px #a78bfa; opacity: 0; transform: translateY(14px) scale(.94); transition: opacity .3s var(--ease), transform .4s cubic-bezier(.34,1.4,.64,1); }
+    html[data-theme="dark"] .toast { background: #f3ecff; color: #1e1238; }
     .toast.show { opacity: 1; transform: none; }
     .toast .ic { width: 20px; height: 20px; border-radius: 9999px; display: grid; place-items: center; flex-shrink: 0; }
-    .toast-success .ic { background: #10d9a0; color: #fff; } .toast-error .ic { background: #ff3d6e; color: #fff; } .toast-info .ic { background: #8b5cf6; color: #fff; }
-    .toast .act { font-weight: 700; color: #ff9ad0; cursor: pointer; background: none; border: 0; padding: .15rem .35rem; border-radius: 8px; }
-    html[data-theme="dark"] .toast .act { color: #d6197a; }
+    .toast-success .ic { background: #10d9a0; color: #fff; } .toast-error .ic { background: #ff3d6e; color: #fff; } .toast-info .ic { background: #7c3aed; color: #fff; }
+    .toast .act { font-weight: 700; color: #c4b5fd; cursor: pointer; background: none; border: 0; padding: .15rem .35rem; border-radius: 8px; }
+    html[data-theme="dark"] .toast .act { color: #6d28d9; }
     .toast .act:hover { background: rgba(255,255,255,.12); }
 
     /* Tile aksi massal */
@@ -340,7 +340,7 @@
     #cs-pop.sheet .cs-head i { display: block; width: 40px; height: 4px; border-radius: 9999px; background: var(--border); margin: 2px auto 12px; }
     #cs-pop.sheet .cs-head b { font-size: .95rem; font-weight: 800; }
     #cs-pop.sheet .cs-opt { padding: .85rem .9rem; font-size: .9rem; }
-    #cs-backdrop.dim { background: rgba(20,4,36,.55); backdrop-filter: blur(3px); }
+    #cs-backdrop.dim { background: rgba(10,6,30,.6); backdrop-filter: blur(3px); }
 
     /* Tabel kelola → kartu di mobile */
     @media (max-width: 767px) {
@@ -366,7 +366,7 @@
     @media (min-width: 1024px) { .bulk-bar { bottom: 2rem; margin-left: 134px; } }
 
     /* Hero */
-    .hero { position: relative; overflow: hidden; border-radius: 26px; color: #fff; background: linear-gradient(120deg, #ff2d95, #c026d3, #7c3aed, #06b6d4, #ff2d95); background-size: 320% 320%; animation: gradShift 12s ease infinite; box-shadow: 0 24px 54px -22px rgba(255,45,149,.75), 0 0 40px -14px #8b5cf6; }
+    .hero { position: relative; overflow: hidden; border-radius: 26px; color: #fff; background: linear-gradient(120deg, #4c1d95, #7c3aed, #3b82f6, #06b6d4, #4c1d95); background-size: 320% 320%; animation: gradShift 12s ease infinite; box-shadow: 0 24px 54px -22px rgba(124,58,237,.75), 0 0 40px -14px #3b82f6; }
     @keyframes gradShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
     .hero::before { content: ""; position: absolute; width: 340px; height: 340px; right: -90px; top: -120px; border-radius: 9999px; background: radial-gradient(circle, rgba(255,255,255,.32), transparent 65%); animation: float 9s ease-in-out infinite; }
     .hero::after { content: ""; position: absolute; width: 260px; height: 260px; left: -80px; bottom: -130px; border-radius: 9999px; background: radial-gradient(circle, rgba(255,255,255,.18), transparent 65%); animation: float 12s ease-in-out infinite reverse; }
@@ -374,13 +374,13 @@
     .hero > * { position: relative; z-index: 1; }
     .hero-btn { background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.34); color: #fff; backdrop-filter: blur(6px); }
     .hero-btn:hover { background: rgba(255,255,255,.3); }
-    .hero-btn.solid { background: #fff; color: #a21caf; border-color: #fff; }
-    .hero-btn.solid:hover { background: #fff0fa; }
+    .hero-btn.solid { background: #fff; color: #5b21b6; border-color: #fff; }
+    .hero-btn.solid:hover { background: #f3ecff; }
     .logo-pulse { animation: pulseRing 2.8s infinite; }
-    @keyframes pulseRing { 0% { box-shadow: 0 0 0 0 rgba(255,45,149,.55); } 70% { box-shadow: 0 0 0 14px rgba(255,45,149,0); } 100% { box-shadow: 0 0 0 0 rgba(255,45,149,0); } }
+    @keyframes pulseRing { 0% { box-shadow: 0 0 0 0 rgba(124,58,237,.55); } 70% { box-shadow: 0 0 0 14px rgba(124,58,237,0); } 100% { box-shadow: 0 0 0 0 rgba(124,58,237,0); } }
 
     /* Ring */
-    .ring-bg { stroke: var(--surface2); } .ring-fg { stroke: url(#ringGrad); transition: stroke-dashoffset 1.2s var(--ease); filter: drop-shadow(0 0 6px rgba(255,45,149,.6)); }
+    .ring-bg { stroke: var(--surface2); } .ring-fg { stroke: url(#ringGrad); transition: stroke-dashoffset 1.2s var(--ease); filter: drop-shadow(0 0 6px rgba(124,58,237,.6)); }
     .bar-track { height: 8px; border-radius: 9999px; background: var(--surface2); overflow: hidden; }
     .bar-fill { height: 100%; border-radius: 9999px; transition: width .9s var(--ease); background-image: linear-gradient(90deg, transparent, rgba(255,255,255,.4), transparent); background-size: 60% 100%; background-repeat: no-repeat; animation: barShine 2.6s infinite; }
     @keyframes barShine { from { background-position: -80% 0; } to { background-position: 180% 0; } }
@@ -395,6 +395,24 @@
     @keyframes flash { 0% { background: color-mix(in srgb, var(--primary) 26%, transparent); } 100% { background: transparent; } }
     .th { padding: .85rem 1rem; font-size: .65rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); background: var(--surface2); }
     .divide-b > tr + tr { border-top: 1px solid var(--border); }
+
+    /* ---------- Unggah TTD massal ---------- */
+    .bt-drop { display: block; border: 2px dashed var(--line); border-radius: 22px; padding: 1.5rem 1rem; text-align: center; cursor: pointer; background: var(--surface2); transition: border-color .2s, background-color .2s, transform .25s var(--ease), box-shadow .25s; }
+    .bt-drop:hover, .bt-drop.over { border-color: var(--primary); background: var(--primary-soft); box-shadow: 0 0 0 4px var(--ring); }
+    .bt-drop.over { transform: scale(1.015); }
+    .bt-drop .bt-ico { display: inline-grid; animation: btFloat 2.6s ease-in-out infinite; }
+    @keyframes btFloat { 50% { transform: translateY(-5px); } }
+    .bt-row { display: flex; align-items: center; gap: .75rem; padding: .6rem .7rem; border: 1px solid var(--border); border-radius: 16px; background: var(--surface2); transition: border-color .2s; }
+    .bt-row:hover { border-color: var(--primary); }
+    .bt-thumb { width: 88px; height: 50px; border-radius: 10px; background: #fff; border: 1px solid var(--line); display: grid; place-items: center; overflow: hidden; flex-shrink: 0; color: #94a3b8; }
+    .bt-thumb img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .bt-sel { width: 250px; flex-shrink: 0; }
+    .bt-stat { min-width: 118px; display: flex; justify-content: flex-end; }
+    @media (max-width: 720px) {
+      .bt-row { flex-wrap: wrap; }
+      .bt-sel { width: 100%; order: 5; }
+      .bt-stat { order: 4; min-width: 0; margin-left: auto; }
+    }
 
     .doc-official { font-family: Arial, Helvetica, sans-serif; }
     .paper { background: #fff !important; color: #000 !important; }
@@ -449,7 +467,7 @@
           <div class="relative">
             <input type="password" id="login-pass" required autocomplete="current-password" placeholder="••••••••" class="input !pl-10 !pr-11 !py-3">
             <i data-ic="lock" class="faint absolute left-3.5 top-3.5"></i>
-            <button type="button" onclick="togglePassword()" class="absolute right-2.5 top-2.5 p-1 faint hover:text-pink-500" aria-label="Tampilkan atau sembunyikan sandi"><i data-ic="eye"></i></button>
+            <button type="button" onclick="togglePassword()" class="absolute right-2.5 top-2.5 p-1 faint hover:text-violet-500" aria-label="Tampilkan atau sembunyikan sandi"><i data-ic="eye"></i></button>
           </div>
         </div>
         <button type="submit" id="btn-login-submit" class="btn btn-primary w-full justify-center !py-3.5 !text-sm">Masuk ke Sistem Admin</button>
@@ -467,7 +485,7 @@
     <!-- Sidebar desktop -->
     <aside class="no-print fixed inset-y-0 left-0 w-[268px] glass border-r hidden lg:flex flex-col z-30" style="border-color:var(--border)">
       <div class="h-[68px] px-6 flex items-center gap-3" style="border-bottom:1px solid var(--border)">
-        <div class="logo-pulse w-10 h-10 rounded-2xl bg-gradient-to-br from-pink-500 to-violet-500 text-white font-extrabold text-xs flex items-center justify-center shadow-lg shadow-pink-500/30">GTK</div>
+        <div class="logo-pulse w-10 h-10 rounded-2xl bg-gradient-to-br from-violet-500 to-blue-500 text-white font-extrabold text-xs flex items-center justify-center shadow-lg shadow-violet-500/30">GTK</div>
         <div class="min-w-0">
           <h1 class="font-extrabold text-sm tracking-tight truncate">SIM Upacara GTK</h1>
           <p class="text-[11px] font-medium muted truncate">SMK Negeri Tambakboyo</p>
@@ -475,7 +493,7 @@
       </div>
 
       <div class="flex-1 px-3.5 py-5 space-y-1 overflow-y-auto">
-        <button onclick="openPalette()" class="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-xs muted mb-3 transition hover:border-pink-400" style="background:var(--surface2);border:1px solid var(--border)">
+        <button onclick="openPalette()" class="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-xs muted mb-3 transition hover:border-violet-400" style="background:var(--surface2);border:1px solid var(--border)">
           <i data-ic="search" data-cls="w-3.5 h-3.5"></i>
           <span class="flex-1 text-left">Cari cepat…</span><span class="kbd">Ctrl K</span>
         </button>
@@ -500,6 +518,7 @@
         <div class="pt-4 mt-4" style="border-top:1px solid var(--border)">
           <p class="px-3 text-[10px] font-extrabold uppercase tracking-widest faint mb-2">Aksi Cepat</p>
           <button onclick="openSpecialModal()" class="btn btn-amber w-full !py-2.5"><i data-ic="calendar"></i> Tambah Hari Khusus</button>
+          <button onclick="openBulkTtd()" class="btn btn-soft w-full !py-2.5 mt-2"><i data-ic="upload"></i> Unggah TTD Massal</button>
           <button onclick="exportExcel()" class="btn btn-soft w-full !py-2.5 mt-2"><i data-ic="sheet"></i> Ekspor ke Excel</button>
         </div>
       </div>
@@ -523,7 +542,7 @@
     <!-- Topbar mobile -->
     <header class="no-print lg:hidden sticky top-0 z-30 glass px-4 h-14 flex items-center justify-between" style="border-bottom:1px solid var(--border)">
       <div class="flex items-center gap-2.5">
-        <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-pink-500 to-violet-500 text-white font-extrabold text-[11px] flex items-center justify-center">GTK</div>
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-500 to-blue-500 text-white font-extrabold text-[11px] flex items-center justify-center">GTK</div>
         <div>
           <h1 class="font-extrabold text-sm leading-none">SIM Upacara GTK</h1>
           <span id="mobile-periode" class="text-[10px] font-medium muted">SMKN Tambakboyo</span>
@@ -583,7 +602,7 @@
               <span id="hero-badge" class="text-[10px] font-extrabold uppercase tracking-widest bg-white/15 border border-white/30 px-3 py-1 rounded-full">Upacara Berikutnya</span>
               <div class="flex items-center gap-2.5">
                 <span class="eq"><i></i><i></i><i></i><i></i><i></i></span>
-                <span id="hero-count" class="text-xs font-bold bg-white text-fuchsia-700 px-3 py-1 rounded-full">—</span>
+                <span id="hero-count" class="text-xs font-bold bg-white text-violet-700 px-3 py-1 rounded-full">—</span>
               </div>
             </div>
             <div>
@@ -606,7 +625,7 @@
           <div class="card lg:col-span-4 p-6 flex items-center gap-5">
             <div class="relative w-[128px] h-[128px] shrink-0">
               <svg viewBox="0 0 120 120" class="w-full h-full -rotate-90">
-                <defs><linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ff2d95"/><stop offset="100%" stop-color="#22d3ee"/></linearGradient></defs>
+                <defs><linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#7c3aed"/><stop offset="100%" stop-color="#5eead4"/></linearGradient></defs>
                 <circle class="ring-bg" cx="60" cy="60" r="52" fill="none" stroke-width="11"/>
                 <circle id="ring-fg" class="ring-fg" cx="60" cy="60" r="52" fill="none" stroke-width="11" stroke-linecap="round" stroke-dasharray="326.73" stroke-dashoffset="326.73"/>
               </svg>
@@ -686,9 +705,12 @@
             <div id="list-perhatian" class="space-y-1.5"></div>
           </div>
           <div class="card p-6">
-            <div class="flex items-center justify-between mb-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
               <div><h3 class="font-extrabold text-sm">Belum Punya TTD Asli</h3><p class="text-xs muted">Tanda tangan masih memakai gaya otomatis</p></div>
-              <span id="badge-no-ttd" class="chip st-warn">0</span>
+              <div class="flex items-center gap-2">
+                <button onclick="openBulkTtd()" class="btn btn-soft !py-1.5"><i data-ic="upload"></i> Unggah Massal</button>
+                <span id="badge-no-ttd" class="chip st-warn">0</span>
+              </div>
             </div>
             <div id="list-no-ttd" class="space-y-1.5"></div>
           </div>
@@ -732,12 +754,15 @@
               <button class="pill" data-f="SI" onclick="setStatusFilter('SI')">Sakit/Izin<span class="cnt" id="tgl-si">0</span></button>
               <button class="pill" data-f="ALPA" onclick="setStatusFilter('ALPA')">Alpa<span class="cnt" id="tgl-alpa">0</span></button>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
               <button onclick="aksiMassal('TANPA KETERANGAN', true)" class="act-tile" style="--c:var(--bad)">
                 <span class="ic"><i data-ic="alert" data-cls="w-5 h-5"></i></span><span class="min-w-0"><b>Tandai Sisa Alpa</b><small>Yang belum diisi → Alpa</small></span>
               </button>
               <button onclick="aksiMassal('LIBUR UPACARA', false)" class="act-tile" style="--c:var(--mute)">
                 <span class="ic"><i data-ic="umbrella" data-cls="w-5 h-5"></i></span><span class="min-w-0"><b>Libur Upacara</b><small>Liburkan semua GTK</small></span>
+              </button>
+              <button onclick="openBulkTtd()" class="act-tile" style="--c:var(--primary)">
+                <span class="ic"><i data-ic="upload" data-cls="w-5 h-5"></i></span><span class="min-w-0"><b>Unggah TTD Massal</b><small>Banyak foto sekaligus</small></span>
               </button>
             </div>
           </div>
@@ -885,6 +910,55 @@
     <span class="text-xs font-bold"><span id="bulk-count">0</span> GTK dipilih</span>
     <button onclick="bulkHadirSelected()" class="btn btn-ok"><i data-ic="check-circle"></i> Tandai Hadir</button>
     <button onclick="clearSelection()" class="btn btn-soft">Batal</button>
+  </div>
+
+  <!-- ============ MODAL: UNGGAH TTD MASSAL ============ -->
+  <div id="bulk-ttd-modal" class="modal" onclick="if(event.target===this) closeBulkTtd()">
+    <div class="modal-panel max-w-3xl p-6 space-y-4">
+      <div class="flex justify-between items-start pb-3" style="border-bottom:1px solid var(--border)">
+        <div>
+          <span class="chip st-pri">Unggah Massal</span>
+          <h3 class="font-extrabold text-base mt-2">Unggah Foto Tanda Tangan Massal</h3>
+          <p class="text-xs muted mt-0.5">Pilih banyak foto sekaligus, cek pasangannya, lalu simpan.</p>
+        </div>
+        <button onclick="closeBulkTtd()" class="btn btn-ghost btn-icon" aria-label="Tutup"><i data-ic="x"></i></button>
+      </div>
+
+      <label id="bt-drop" class="bt-drop">
+        <input type="file" id="bt-file" accept="image/*" multiple class="hidden" onchange="btAdd(this.files); this.value=''">
+        <span class="bt-ico st-pri w-12 h-12 rounded-2xl place-items-center mb-2"><i data-ic="upload" data-cls="w-6 h-6"></i></span>
+        <p class="text-sm font-extrabold">Tarik & lepas foto ke sini, atau klik untuk memilih</p>
+        <p class="text-[11px] muted mt-1">PNG, JPG, atau WEBP • maksimal 150 foto sekali unggah</p>
+      </label>
+
+      <div class="rounded-2xl p-3.5 text-[11.5px] leading-relaxed" style="background:var(--surface2);border:1px solid var(--border)">
+        <p class="font-extrabold mb-1 flex items-center gap-1.5">Cara penamaan file agar otomatis cocok</p>
+        <p class="muted">Awali nama file dengan <b>nomor urut GTK</b> (contoh: <span class="kbd">12.png</span>, <span class="kbd">12 - Ahmad.jpg</span>), atau tulis <b>nama GTK</b> (contoh: <span class="kbd">ahmad mufarid.jpg</span>). Foto yang tidak cocok bisa dipasangkan manual lewat pilihan di tiap baris.</p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-x-6 gap-y-2">
+        <label class="flex items-center gap-2 text-xs font-semibold cursor-pointer"><input type="checkbox" id="bt-opt-bg" class="cb" checked onchange="btOptChange()"> Hapus latar putih (jadikan transparan)</label>
+        <label class="flex items-center gap-2 text-xs font-semibold cursor-pointer"><input type="checkbox" id="bt-opt-trim" class="cb" checked onchange="btOptChange()"> Potong ruang kosong di sekitar tanda tangan</label>
+      </div>
+
+      <div id="bt-list-wrap" class="hidden space-y-2.5">
+        <div class="flex items-center justify-between gap-2">
+          <p id="bt-summary" class="text-xs font-bold muted"></p>
+          <button type="button" onclick="btClear()" class="text-xs font-bold hover:underline" style="color:var(--bad)">Kosongkan daftar</button>
+        </div>
+        <div id="bt-list" class="space-y-2 max-h-[42vh] overflow-y-auto pr-1"></div>
+      </div>
+
+      <div id="bt-progress" class="hidden">
+        <div class="flex items-center justify-between text-[11px] font-bold muted mb-1.5"><span id="bt-prog-text">Mengunggah…</span><span id="bt-prog-pct">0%</span></div>
+        <div class="bar-track"><div id="bt-bar" class="bar-fill" style="width:0;background-color:var(--primary)"></div></div>
+      </div>
+
+      <div class="flex gap-2.5 pt-1">
+        <button type="button" id="bt-close" onclick="closeBulkTtd()" class="btn btn-soft flex-1 justify-center !py-2.5">Tutup</button>
+        <button type="button" id="bt-go" onclick="startBulkUpload()" class="btn btn-primary flex-[2] justify-center !py-2.5" disabled><i data-ic="upload"></i><span id="bt-go-label">Unggah Tanda Tangan</span></button>
+      </div>
+    </div>
   </div>
 
   <!-- ============ MODAL: HARI KHUSUS ============ -->
@@ -1098,7 +1172,7 @@
 
     const MONTHS_ID = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
     const DAYS_ID = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-    const KPOP_COLORS = ['#ff4fa8', '#a78bfa', '#22d3ee', '#fde047', '#ff7bbd'];
+    const KPOP_COLORS = ['#a78bfa', '#60a5fa', '#5eead4', '#fde68a', '#c4b5fd'];
 
     let sessionToken = sessionStorage.getItem('smk_upacara_token') || "";
     let wbData = null;
@@ -1133,6 +1207,7 @@
       setInterval(updateSyncLabel, 30000);
       enhanceSelects();
       renderDP();
+      initBulkDrop();
       document.addEventListener('keydown', onGlobalKey);
       // Efek riak + percikan bintang pada tombol
       document.addEventListener('pointerdown', (e) => {
@@ -1168,10 +1243,11 @@
       }
     }
 
+    // Pita teks berjalan. Setiap kata diulang agar pita cukup panjang untuk layar lebar.
     function buildTicker() {
-      const items = ['DISIPLIN', 'KOMPAK', 'BERPRESTASI', 'SMK NEGERI TAMBAKBOYO', 'UPACARA GTK', 'SIAP TAMPIL'];
-      const one = items.map(t => `<span class="tk">${ic('sparkle', 'w-3.5 h-3.5')}${t}</span>`).join('');
-      $('ticker-track').innerHTML = one + one;
+      const items = ['UNGGUL', 'BERKARAKTER', 'SIAP KERJA'];
+      const half = Array.from({ length: 4 }, () => items.map(t => `<span class="tk">${ic('sparkle', 'w-3.5 h-3.5')}${t}</span>`).join('')).join('');
+      $('ticker-track').innerHTML = half + half;
     }
 
     function buildSparkles() {
@@ -1383,7 +1459,7 @@
       const svg = ic(dark ? 'sun' : 'moon');
       const a = $('theme-ic'); if (a) a.innerHTML = svg;
       document.querySelectorAll('.theme-ic-m').forEach(e => e.innerHTML = svg);
-      const m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = dark ? '#0c0516' : '#ff2d95';
+      const m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = dark ? '#08061a' : '#7c3aed';
     }
     const cssVar = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 
@@ -1725,8 +1801,8 @@
       trenChart = new Chart($('chart-tren'), {
         type: 'bar',
         data: { labels, datasets: [
-          { label: 'Hadir (TTD)', data: dH, backgroundColor: '#22d3ee', borderRadius: 8, barPercentage: 0.6 },
-          { label: 'Tidak Hadir', data: dA, backgroundColor: '#ff4fa8', borderRadius: 8, barPercentage: 0.6 }
+          { label: 'Hadir (TTD)', data: dH, backgroundColor: '#2dd4bf', borderRadius: 8, barPercentage: 0.6 },
+          { label: 'Tidak Hadir', data: dA, backgroundColor: '#f472b6', borderRadius: 8, barPercentage: 0.6 }
         ] },
         options: {
           responsive: true, maintainAspectRatio: false,
@@ -1737,7 +1813,7 @@
       });
 
       const kl = Object.keys(kepegMap), kv = Object.values(kepegMap);
-      const palette = ['#ff4fa8', '#a78bfa', '#22d3ee', '#fde047', '#34e8b4'];
+      const palette = ['#8b5cf6', '#3b82f6', '#2dd4bf', '#fbbf24', '#f472b6'];
       if (kepegChart) kepegChart.destroy();
       kepegChart = new Chart($('chart-kepeg'), {
         type: 'doughnut',
@@ -2126,9 +2202,9 @@
 
         const fillOf = { 'HADIR': 'FFD1FAE5', 'SAKIT': 'FFFEF3C7', 'IZIN': 'FFE0F2FE', 'TANPA KETERANGAN': 'FFFFE4E6', 'LIBUR UPACARA': 'FFE2E8F0' };
         const fontOf = { 'HADIR': 'FF047857', 'SAKIT': 'FFB45309', 'IZIN': 'FF0369A1', 'TANPA KETERANGAN': 'FFBE123C', 'LIBUR UPACARA': 'FF475569' };
-        const thin = { style: 'thin', color: { argb: 'FFE9B8D6' } };
+        const thin = { style: 'thin', color: { argb: 'FFDDD0FA' } };
         const border = { top: thin, left: thin, bottom: thin, right: thin };
-        const headFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE11D80' } };
+        const headFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF6D28D9' } };
 
         /* ----- Sheet 1: Rekap per GTK ----- */
         const nCols = 5 + tg.length + 6;
@@ -2138,9 +2214,9 @@
         });
         ws.mergeCells(1, 1, 1, nCols); ws.mergeCells(2, 1, 2, nCols);
         const c1 = ws.getCell(1, 1); c1.value = 'REKAPITULASI KEHADIRAN GTK UPACARA BENDERA';
-        c1.font = { bold: true, size: 15, color: { argb: 'FF701A75' } }; c1.alignment = { horizontal: 'center', vertical: 'middle' };
+        c1.font = { bold: true, size: 15, color: { argb: 'FF4C1D95' } }; c1.alignment = { horizontal: 'center', vertical: 'middle' };
         const c2 = ws.getCell(2, 1); c2.value = `SMK Negeri Tambakboyo  •  Periode ${wbData.bulan} ${wbData.tahun}`;
-        c2.font = { size: 11, color: { argb: 'FF7A5A8C' } }; c2.alignment = { horizontal: 'center', vertical: 'middle' };
+        c2.font = { size: 11, color: { argb: 'FF6B5A8F' } }; c2.alignment = { horizontal: 'center', vertical: 'middle' };
         ws.getRow(1).height = 26; ws.getRow(2).height = 20; ws.getRow(3).height = 8;
 
         const head = ['No', 'Nama', 'Jabatan', 'Kepegawaian', 'JK', ...tg.map(t => `${t.hari}\n${t.label}`), 'Hadir', 'Sakit', 'Izin', 'Alpa', 'Libur', '% Hadir'];
@@ -2164,7 +2240,7 @@
               const raw = g.absensi[tg[i - 5].colIndex] || '';
               if (raw && fillOf[raw]) { c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: fillOf[raw] } }; c.font = { size: 10, bold: true, color: { argb: fontOf[raw] } }; }
             } else if (ri % 2 === 1) {
-              c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFDF4FA' } };
+              c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF7F3FF' } };
             }
             if (i === nCols - 1) { c.numFmt = '0%'; c.font = { size: 10, bold: true }; }
           });
@@ -2413,6 +2489,282 @@
       finally { btn.disabled = false; btn.textContent = 'Simpan Tanda Tangan'; }
     }
 
+    /* =========================== UNGGAH TTD MASSAL =========================== */
+    const BT = { items: [], seq: 0, busy: false, opt: { removeBg: true, trim: true } };
+    const BT_MAX_FILES = 150;
+    const BT_MAX_CHARS = 45000;   // batas aman ukuran data gambar per tanda tangan
+
+    // Mencocokkan nama file dengan GTK: awalan nomor urut dulu, lalu kemiripan nama.
+    function btAutoMatch(fileName) {
+      const base = String(fileName).replace(/\.[^.]+$/, '');
+      const m = base.match(/^\s*(\d{1,3})(?!\d)/);
+      if (m) { const no = Number(m[1]); if (wbData.guruList.some(g => g.no === no)) return no; }
+      const tok = (s) => String(s).toLowerCase().replace(/[^a-z\s]/g, ' ').split(/\s+/).filter(t => t.length >= 3);
+      const ft = new Set(tok(base)); if (!ft.size) return '';
+      let best = null, bestScore = 0, tie = false;
+      wbData.guruList.forEach(g => {
+        const nt = tok(namaBersih(g.nama)); if (!nt.length) return;
+        const common = nt.filter(t => ft.has(t)).length; if (!common) return;
+        const score = common / Math.max(nt.length, ft.size);
+        if (score > bestScore) { bestScore = score; best = g; tie = false; }
+        else if (score === bestScore) tie = true;
+      });
+      return (best && bestScore >= 0.4 && !tie) ? best.no : '';
+    }
+
+    // Foto → PNG tanda tangan: latar putih dihapus, ruang kosong dipotong, ukuran dirapikan.
+    function processSignatureImage(img, opt) {
+      const OUT_W = 380, OUT_H = 150;
+      const k = Math.min(1, 1200 / Math.max(img.naturalWidth, img.naturalHeight));
+      const w = Math.max(1, Math.round(img.naturalWidth * k)), h = Math.max(1, Math.round(img.naturalHeight * k));
+      const src = document.createElement('canvas'); src.width = w; src.height = h;
+      const sctx = src.getContext('2d', { willReadFrequently: true });
+      sctx.fillStyle = '#fff'; sctx.fillRect(0, 0, w, h);
+      sctx.drawImage(img, 0, 0, w, h);
+      const id = sctx.getImageData(0, 0, w, h), d = id.data, n = w * h;
+      const lum = new Uint8Array(n), hist = new Uint32Array(256);
+      for (let p = 0, i = 0; p < n; p++, i += 4) {
+        const l = (d[i] * 299 + d[i + 1] * 587 + d[i + 2] * 114) / 1000 | 0;
+        lum[p] = l; hist[l]++;
+      }
+      // Tingkat kecerahan kertas = persentil ke-85
+      let acc = 0, bg = 255; const target = n * 0.85;
+      for (let v = 0; v < 256; v++) { acc += hist[v]; if (acc >= target) { bg = v; break; } }
+      bg = Math.max(bg, 120);
+
+      if (opt.removeBg) {
+        const hi = bg * 0.92, lo = bg * 0.55;
+        for (let p = 0, i = 0; p < n; p++, i += 4) {
+          let a = (hi - lum[p]) / (hi - lo);
+          a = a <= 0.1 ? 0 : a >= 1 ? 1 : a;
+          d[i] = 15; d[i + 1] = 23; d[i + 2] = 42; d[i + 3] = Math.round(a * 255);
+        }
+        sctx.putImageData(id, 0, 0);
+      }
+
+      let sx = 0, sy = 0, sw = w, sh = h;
+      if (opt.trim) {
+        const thr = bg * 0.75, rows = new Uint32Array(h), cols = new Uint32Array(w);
+        for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) if (lum[y * w + x] < thr) { rows[y]++; cols[x]++; }
+        const first = (arr) => arr.findIndex(c => c >= 2);
+        const last = (arr) => { for (let i = arr.length - 1; i >= 0; i--) if (arr[i] >= 2) return i; return -1; };
+        const y0 = first(rows), y1 = last(rows), x0 = first(cols), x1 = last(cols);
+        if (y0 >= 0 && x0 >= 0 && y1 > y0 && x1 > x0) {
+          const pd = Math.round(Math.max(w, h) * 0.01) + 4;
+          sx = Math.max(0, x0 - pd); sy = Math.max(0, y0 - pd);
+          sw = Math.min(w, x1 + pd + 1) - sx; sh = Math.min(h, y1 + pd + 1) - sy;
+        }
+      }
+
+      let scale = Math.min(OUT_W / sw, OUT_H / sh, 2);
+      const out = document.createElement('canvas'), octx = out.getContext('2d');
+      let url = '';
+      for (let tries = 0; tries < 8; tries++) {
+        out.width = Math.max(1, Math.round(sw * scale)); out.height = Math.max(1, Math.round(sh * scale));
+        octx.clearRect(0, 0, out.width, out.height);
+        octx.imageSmoothingQuality = 'high';
+        if (!opt.removeBg) { octx.fillStyle = '#fff'; octx.fillRect(0, 0, out.width, out.height); }
+        octx.drawImage(src, sx, sy, sw, sh, 0, 0, out.width, out.height);
+        url = out.toDataURL('image/png');
+        if (url.length <= BT_MAX_CHARS || out.width <= 90) break;
+        scale *= 0.8;
+      }
+      return url;
+    }
+
+    const btLoadImg = (url) => new Promise((res, rej) => {
+      const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error('Gambar tidak dapat dibaca (format tidak didukung browser)')); i.src = url;
+    });
+
+    function openBulkTtd() {
+      if (!wbData) return;
+      if (!BT.busy) BT.items = BT.items.filter(it => { if (it.status === 'ok') { URL.revokeObjectURL(it.url); return false; } return true; });
+      btRenderList();
+      openModal('bulk-ttd-modal');
+    }
+    function closeBulkTtd() {
+      if (BT.busy) { showToast('Tunggu proses unggah selesai dulu.'); return; }
+      closeModal('bulk-ttd-modal');
+    }
+
+    function initBulkDrop() {
+      const z = $('bt-drop');
+      ['dragenter', 'dragover'].forEach(ev => z.addEventListener(ev, e => { e.preventDefault(); z.classList.add('over'); }));
+      ['dragleave', 'drop'].forEach(ev => z.addEventListener(ev, e => { e.preventDefault(); z.classList.remove('over'); }));
+      z.addEventListener('drop', e => { if (e.dataTransfer && e.dataTransfer.files.length) btAdd(e.dataTransfer.files); });
+      // Cegah browser membuka file bila terlepas di luar area unggah
+      ['dragover', 'drop'].forEach(ev => window.addEventListener(ev, e => { if ($('bulk-ttd-modal').classList.contains('open')) e.preventDefault(); }));
+      $('bt-list').addEventListener('change', (e) => {
+        const s = e.target.closest('select[data-bt]'); if (!s || BT.busy) return;
+        const it = BT.items.find(x => x.id === Number(s.dataset.bt)); if (!it) return;
+        it.gtkNo = Number(s.value) || '';
+        if (it.status === 'err') { it.status = 'ready'; it.msg = ''; }
+        btRefresh();
+      });
+      $('bt-list').addEventListener('click', (e) => {
+        const b = e.target.closest('[data-rm]'); if (!b || BT.busy) return;
+        const id = Number(b.dataset.rm), it = BT.items.find(x => x.id === id); if (!it) return;
+        URL.revokeObjectURL(it.url);
+        BT.items = BT.items.filter(x => x.id !== id);
+        const row = b.closest('.bt-row'); if (row) row.remove();
+        $('bt-list-wrap').classList.toggle('hidden', !BT.items.length);
+        btRefresh();
+      });
+    }
+
+    async function btAdd(fileList) {
+      const files = [...fileList];
+      if (BT.busy || !files.length) return;
+      const imgs = files.filter(f => /^image\//.test(f.type) || /\.(png|jpe?g|webp|gif|bmp)$/i.test(f.name));
+      if (files.length - imgs.length) toastErr(`${files.length - imgs.length} file dilewati karena bukan gambar.`);
+      let fresh = imgs.filter(f => !BT.items.some(it => it.name === f.name && it.size === f.size));
+      const room = BT_MAX_FILES - BT.items.length;
+      if (fresh.length > room) { toastErr(`Maksimal ${BT_MAX_FILES} foto sekali unggah. Sisanya dilewati.`); fresh = fresh.slice(0, Math.max(0, room)); }
+      if (!fresh.length) return;
+      fresh.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+      const added = fresh.map(f => ({ id: ++BT.seq, name: f.name, size: f.size, url: URL.createObjectURL(f), img: null, dataUrl: '', gtkNo: btAutoMatch(f.name), status: 'processing', msg: '' }));
+      BT.items.push(...added);
+      btRenderList();
+      for (const it of added) await btProcess(it);
+      const m = added.filter(i => i.gtkNo).length;
+      showToast(`${m} dari ${added.length} foto otomatis dipasangkan dengan GTK.`);
+    }
+
+    async function btProcess(it) {
+      try {
+        if (!it.img) it.img = await btLoadImg(it.url);
+        await new Promise(r => setTimeout(r, 0));
+        it.dataUrl = processSignatureImage(it.img, BT.opt);
+        it.status = 'ready'; it.msg = '';
+      } catch (err) { it.status = 'invalid'; it.msg = err.message; }
+      btUpdateRow(it);
+    }
+
+    async function btOptChange() {
+      BT.opt.removeBg = $('bt-opt-bg').checked;
+      BT.opt.trim = $('bt-opt-trim').checked;
+      const list = BT.items.filter(it => it.img && it.status !== 'ok' && it.status !== 'uploading');
+      list.forEach(it => { it.status = 'processing'; btUpdateRow(it); });
+      for (const it of list) await btProcess(it);
+    }
+
+    function btOptions(sel) {
+      return '<option value="">— Pilih GTK —</option>' + wbData.guruList.map(g => `<option value="${g.no}" ${sel === g.no ? 'selected' : ''}>${g.no}. ${esc(g.nama)}</option>`).join('');
+    }
+    function btThumb(it) {
+      if (it.status === 'processing') return '<span class="skeleton w-full h-full block"></span>';
+      if (it.status === 'invalid') return ic('alert', 'w-5 h-5');
+      return `<img src="${it.dataUrl}" alt="Pratinjau ${esc(it.name)}">`;
+    }
+    function btRowHtml(it) {
+      return `
+        <div class="bt-row row-in" data-id="${it.id}">
+          <div class="bt-thumb" data-thumb>${btThumb(it)}</div>
+          <div class="min-w-0 flex-1">
+            <p class="text-[12px] font-bold truncate" title="${esc(it.name)}">${esc(it.name)}</p>
+            <p class="text-[10.5px] muted" data-sub></p>
+          </div>
+          <div class="bt-sel"><select class="input !py-1.5 !text-xs" data-bt="${it.id}" data-title="Pasangkan dengan GTK">${btOptions(it.gtkNo)}</select></div>
+          <div class="bt-stat" data-stat></div>
+          <button type="button" class="btn btn-ghost btn-icon" data-rm="${it.id}" aria-label="Hapus foto">${ic('x', 'w-4 h-4')}</button>
+        </div>`;
+    }
+    function btChip(it, skipDup) {
+      if (it.status === 'processing') return '<span class="chip st-none">Memproses…</span>';
+      if (it.status === 'invalid') return '<span class="chip st-bad">Tak terbaca</span>';
+      if (it.status === 'uploading') return `<span class="chip st-info"><span style="display:inline-flex;animation:spin 1s linear infinite">${ic('refresh', 'w-3 h-3')}</span> Mengunggah</span>`;
+      if (it.status === 'ok') return `<span class="chip st-ok">${ic('check', 'w-3 h-3')} Tersimpan</span>`;
+      if (it.status === 'err') return '<span class="chip st-bad">Gagal</span>';
+      if (!it.gtkNo) return '<span class="chip st-warn">Pilih GTK</span>';
+      if (skipDup) return '<span class="chip st-mute">Dilewati (ganda)</span>';
+      const g = wbData.guruList.find(x => x.no === it.gtkNo);
+      return g && g.ttdUrl ? '<span class="chip st-pri">Ganti TTD lama</span>' : '<span class="chip st-ok">Siap</span>';
+    }
+
+    function btRenderList() {
+      const list = $('bt-list');
+      list.innerHTML = BT.items.map(btRowHtml).join('');
+      list.querySelectorAll('select.input').forEach(enhanceSelect);
+      $('bt-list-wrap').classList.toggle('hidden', !BT.items.length);
+      btRefresh();
+    }
+    function btUpdateRow(it) {
+      const row = document.querySelector(`#bt-list [data-id="${it.id}"]`);
+      if (row) row.querySelector('[data-thumb]').innerHTML = btThumb(it);
+      btRefresh();
+    }
+
+    // Memperbarui status tiap baris, ringkasan, dan tombol unggah tanpa membuat ulang daftar.
+    function btRefresh() {
+      const last = {};
+      BT.items.forEach((it, i) => { if (it.gtkNo && (it.status === 'ready' || it.status === 'err' || it.status === 'uploading')) last[it.gtkNo] = i; });
+      let valid = 0, matched = 0, targets = 0;
+      BT.items.forEach((it, i) => {
+        const skip = !!(it.gtkNo && last[it.gtkNo] !== undefined && last[it.gtkNo] !== i && (it.status === 'ready' || it.status === 'err'));
+        it._skip = skip;
+        if (it.status === 'ready' || it.status === 'err' || it.status === 'ok' || it.status === 'uploading') { valid++; if (it.gtkNo) matched++; }
+        if ((it.status === 'ready' || it.status === 'err') && it.gtkNo && !skip) targets++;
+        const row = document.querySelector(`#bt-list [data-id="${it.id}"]`); if (!row) return;
+        row.querySelector('[data-stat]').innerHTML = btChip(it, skip);
+        const sub = row.querySelector('[data-sub]');
+        if ((it.status === 'err' || it.status === 'invalid') && it.msg) { sub.textContent = it.msg; sub.style.color = 'var(--bad)'; }
+        else { sub.textContent = (it.size / 1024).toFixed(0) + ' KB'; sub.style.color = ''; }
+      });
+      $('bt-summary').textContent = `${BT.items.length} foto • ${matched} sudah dipasangkan • ${valid - matched} perlu dipilih`;
+      $('bt-go-label').textContent = targets ? `Unggah ${targets} Tanda Tangan` : 'Unggah Tanda Tangan';
+      $('bt-go').disabled = BT.busy || !targets;
+      $('bt-close').disabled = BT.busy;
+    }
+
+    function btClear() {
+      if (BT.busy) return;
+      BT.items.forEach(it => URL.revokeObjectURL(it.url));
+      BT.items = [];
+      $('bt-progress').classList.add('hidden');
+      btRenderList();
+    }
+
+    async function startBulkUpload() {
+      if (BT.busy || !wbData) return;
+      const targets = BT.items.filter(it => (it.status === 'ready' || it.status === 'err') && it.gtkNo && !it._skip);
+      if (!targets.length) { toastErr('Belum ada foto yang siap diunggah. Pasangkan dulu setiap foto dengan GTK.'); return; }
+      const replace = targets.filter(it => { const g = wbData.guruList.find(x => x.no === it.gtkNo); return g && g.ttdUrl; }).length;
+      const ok = await confirmDialog({
+        title: `Unggah ${targets.length} tanda tangan?`,
+        message: replace ? `${replace} GTK sudah punya tanda tangan dan akan diganti dengan foto baru.` : 'Tanda tangan akan disimpan ke spreadsheet dan langsung dipakai di daftar hadir.',
+        okText: 'Unggah Sekarang', icon: 'upload'
+      });
+      if (!ok) return;
+
+      BT.busy = true; btRefresh();
+      $('bt-progress').classList.remove('hidden');
+      let done = 0, okc = 0, fail = 0;
+      const setProg = () => {
+        const p = Math.round(done / targets.length * 100);
+        $('bt-bar').style.width = p + '%'; $('bt-prog-pct').textContent = p + '%';
+        $('bt-prog-text').textContent = `Mengunggah ${Math.min(done + 1, targets.length)} dari ${targets.length}…`;
+      };
+      setProg();
+      for (const it of targets) {
+        if (!wbData) break;
+        const g = wbData.guruList.find(x => x.no === it.gtkNo);
+        it.status = 'uploading'; it.msg = ''; btRefresh();
+        try {
+          if (!g) throw new Error('GTK tidak ditemukan');
+          const res = await callApiPost({ action: 'saveSignature', noGuru: g.no, namaGuru: g.nama, ttdDataUrl: it.dataUrl });
+          if (!res.success) throw new Error(res.message || 'Server menolak data');
+          g.ttdUrl = it.dataUrl; it.status = 'ok'; okc++;
+        } catch (err) { it.status = 'err'; it.msg = err.message; fail++; }
+        done++; setProg(); btRefresh();
+      }
+      BT.busy = false;
+      $('bt-prog-text').textContent = 'Selesai';
+      btRefresh();
+      if (wbData) { renderDashboard(); renderKelolaList(); renderLaporan(); }
+      if (fail) toastErr(`${okc} berhasil, ${fail} gagal. Tekan tombol unggah lagi untuk mengulang yang gagal.`);
+      else toastOk(`${okc} tanda tangan berhasil disimpan.`);
+    }
+
     /* =========================== PALET PERINTAH =========================== */
     function openPalette() {
       if (!wbData) return;
@@ -2428,6 +2780,7 @@
         { ic: 'printer', t: 'Laporan & Cetak', s: 'Halaman', run: () => switchPage('laporan') },
         { ic: 'archive', t: 'Arsip Bulanan', s: 'Halaman', run: () => switchPage('arsip') },
         { ic: 'calendar', t: 'Tambah Hari Khusus Upacara', s: 'Aksi', run: () => openSpecialModal() },
+        { ic: 'upload', t: 'Unggah Foto TTD Massal', s: 'Aksi', run: () => openBulkTtd() },
         { ic: 'sheet', t: 'Ekspor Rekap ke Excel', s: 'Aksi', run: () => exportExcel() },
         { ic: 'trend', t: 'Cetak Rekap Bulanan', s: 'Aksi', run: () => { setLaporanMode('rekap'); switchPage('laporan'); } },
         { ic: 'moon', t: 'Ganti Tema Terang/Gelap', s: 'Aksi', run: () => toggleTheme() },
