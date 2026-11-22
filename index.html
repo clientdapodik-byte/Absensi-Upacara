@@ -773,9 +773,9 @@
                 <tr>
                   <th class="th w-12 text-center"><input type="checkbox" id="sel-all" class="cb" aria-label="Pilih semua yang tampil" onchange="toggleSelectAll(this.checked)"></th>
                   <th class="th w-14 text-center">No</th>
-                  <th class="th min-w-[250px]">Nama & Jabatan</th>
+                  <th class="th text-center min-w-[250px]">Nama & Jabatan</th>
                   <th class="th w-52 text-center hidden md:table-cell">Paraf / Status</th>
-                  <th class="th text-right min-w-[300px]">Input Presensi</th>
+                  <th class="th text-center min-w-[300px]">Input Presensi</th>
                 </tr>
               </thead>
               <tbody id="kelola-tbody" class="divide-b text-sm"></tbody>
@@ -1859,7 +1859,7 @@
 
       const selKp = $('filter-kepeg'), pk = selKp.value;
       const uniq = [...new Set(wbData.guruList.map(g => g.statusKepeg).filter(Boolean))];
-      selKp.innerHTML = '<option value="ALL">Semua Kepegawaian</option>' + uniq.map(k => `<option value="${esc(k)}">${esc(k)}</option>`).join('');
+      selKp.innerHTML = '<option value="ALL">Tampilkan Semua</option>' + uniq.map(k => `<option value="${esc(k)}">${esc(k)}</option>`).join('');
       if (pk) selKp.value = pk;
     }
 
