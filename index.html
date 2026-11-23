@@ -2144,9 +2144,11 @@
         const st = g.absensi[col] || '';
         const odd = g.no % 2 === 1;
         const isHadir = st === 'HADIR';
+        const isAlpa = st === 'TANPA KETERANGAN';
+        // Hadir → tanda tangan; Alpa → dikosongkan; Sakit/Izin/Libur → tulisan status
         const cell = isHadir
           ? `<div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:5;pointer-events:none;white-space:nowrap">${renderSignatureLaporan(g)}</div>`
-          : st ? `<span class="text-[10.5px] font-bold uppercase">${esc(st)}</span>` : '';
+          : (st && !isAlpa) ? `<span class="text-[10.5px] font-bold uppercase">${esc(st)}</span>` : '';
         const wrap = `<div class="flex items-center gap-1.5 h-16 px-1.5" style="position:relative"><span class="text-[10.5px] w-4 shrink-0">${g.no}</span><div class="flex-1 min-w-0 h-full flex items-center justify-center" style="position:relative">${cell}</div></div>`;
         return `
           <tr>
