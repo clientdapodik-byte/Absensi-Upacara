@@ -1087,7 +1087,7 @@
   <script>
     // =========================================================================
     // URL WEB APP GOOGLE APPS SCRIPT
-    const API_URL = "https://script.google.com/macros/s/AKfycbzS-yZOU-W1NPj9pE4qkawmCDqQSwp9LpPgMYxV1_dZUi--0ZdXB76dxbZ9ZKnOW-A03w/exec?action=getLogo";
+    const API_URL = "https://script.google.com/macros/s/AKfycbzS-yZOU-W1NPj9pE4qkawmCDqQSwp9LpPgMYxV1_dZUi--0ZdXB76dxbZ9ZKnOW-A03w/exec";
     // =========================================================================
 
     const LOGO_DEFAULT = "https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Coat_of_arms_of_East_Java.svg/240px-Coat_of_arms_of_East_Java.svg.png";
@@ -1709,8 +1709,7 @@
     function judulDaftarHadir(t) {
       if (!t) return 'DAFTAR HADIR GTK UPACARA BENDERA';
       const j = String(t.judulUpacara || '').trim().toUpperCase();
-      if (!t.isKhusus) return `DAFTAR HADIR GTK ${j}`;
-      return `DAFTAR HADIR ${/^UPACARA\b/.test(j) ? j : 'UPACARA ' + j}`;
+      return 'DAFTAR HADIR GTK ' + (t.isKhusus && !/^UPACARA\b/.test(j) ? 'UPACARA ' + j : j);
     }
     function namaBersih(nama) { return String(nama).replace(/,.*$/, '').replace(/^(Drs\.|Dra\.|Dr\.|H\.|Hj\.|M\.|MOH\.)\s*/gi, '').trim(); }
     function initials(nama) {
